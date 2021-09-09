@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "typeRoots": ["./src/types/custom.d.ts"]
+    },
+    "exclude": ["node_modules", "**/*.spec.ts"],
