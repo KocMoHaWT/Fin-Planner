@@ -25,9 +25,9 @@ export default class Server {
         });
     };
 
-    public loadControllers(controllers: Array<any>): void {
-        controllers.forEach(controller => {
-            this.app.use(controller.path, controller.setRoutes());
+    public loadRoutes(routes: Array<any>): void {
+        routes.forEach(route => {
+            this.app.use(route.configureRoutes());
         });
     };
 
