@@ -1,0 +1,63 @@
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    BeforeInsert,
+    CreateDateColumn,
+    UpdateDateColumn,
+    DeleteDateColumn,
+    OneToOne,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+  } from "typeorm";
+import { Bucket } from "./bucket";
+import { Currency } from "./currency";
+import { UserAuth } from "./users-auth";
+  
+  @Entity("users")
+  export class User {
+    @PrimaryGeneratedColumn("uuid")
+    id: number;
+  
+    @Column({ type: "varchar", length: 200, nullable: false })
+    firstName: string;
+  
+    @Column({ type: "varchar", length: 200, nullable: false })
+    lastName: string;
+  
+    @Column({ type: "varchar", length: 200, nullable: false })
+    email: string;
+  
+    @Column({ type: "varchar", nullable: false })
+    password: string;
+  
+    @CreateDateColumn()
+    createdAt: Date;
+  
+    @UpdateDateColumn()
+    updatedAt: Date;
+  
+    @DeleteDateColumn()
+    deleteAt: Date;
+
+    @OneToOne(() => UserAuth)
+    @JoinColumn()
+    authentication: UserAuth;
+
+    @OneToOne(() => Currency)
+    @JoinColumn()
+    defaultCurrency: Currency;
+    
+    @OneToMany(() => Bucket, bucket => bucket.user)
+    buckets: Bucket[];
+  
+    // @OneToMany(() => PostLikes, post => post.user)
+    // @JoinColumn()
+    // post: PostLikes[];
+  
+    // @ManyToOne(() => Role)
+    // @JoinColumn()
+    // role: Role;
+  }
+  

@@ -5,7 +5,7 @@ import connection from './db';
 import AuthRoutes from './auth';
 
 const app = express();
-const server = new Server(app, connection, 3000);
+const server = new Server(app, connection, 3001);
 
 const routes = [
     AuthRoutes
