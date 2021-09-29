@@ -8,12 +8,11 @@ export interface IAuthController {
 export class AuthController implements IAuthController {
     private service;
 
-    constructor(service: IAuthService) {
-        console.log('heh', service);
+    constructor(service: IAuthService) {;
         this.service = service;
     }
 
-     kek = async (req: Request, res: Response ) => {
+     async kek(req: Request, res: Response ) {
         return this.service.test(req, res);
     }
 }

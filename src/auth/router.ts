@@ -17,8 +17,7 @@ export class AuthRouter extends CommonRoutesConfig {
     }
 
     configureRoutes() {
-        this.router.get('/', [this.controller.kek])
+        this.router.get('/', [this.controller.kek.bind(this.controller)])
         return this.router;
     }
-
 }
