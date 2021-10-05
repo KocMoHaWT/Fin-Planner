@@ -1,33 +1,33 @@
-import { IUserService } from "./service";
+import { IAccountService } from "./service";
 import { Response, Request } from "express";
 
-export interface IUserController {
+export interface IAccountController {
     create: (req: Request, res: Response ) => Promise<any>;
     update: (req: Request, res: Response ) => Promise<any>;
     read: (req: Request, res: Response ) => Promise<any>;
     delete: (req: Request, res: Response ) => Promise<any>;
 }
 
-export class UserController implements IUserController {
-    private service;
+export class AccountController implements IAccountController {
+    private service: IAccountService;
 
-    constructor(service: IUserService) {;
+    constructor(service: IAccountService) {;
         this.service = service;
     }
 
     async create(req: Request, res: Response ) {
-        return this.service.create(req, res);
+        return this.service.createAccount(req, res);
     }
 
     async read(req: Request, res: Response ) {
-        return this.service.read(req, res);
+        return this.service.getAccount(req, res);
     }
 
     async delete(req: Request, res: Response ) {
-        return this.service.delete(req, res);
+        return this.service.deleteAccount(req, res);
     }
 
     async update(req: Request, res: Response ) {
-        return this.service.update(req, res);
+        return this.service.updateAccount(req, res);
     }
 }

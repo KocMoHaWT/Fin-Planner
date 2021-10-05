@@ -11,8 +11,7 @@ import {
     ManyToOne,
     OneToMany,
   } from "typeorm";
-import { User } from "./user";
-import { UserAuth } from "./users-auth";
+import { Account } from "./account";
   
   @Entity("incomes")
   export class Income {
@@ -25,20 +24,8 @@ import { UserAuth } from "./users-auth";
     @Column({ type: "boolean", default: false})
     constant: false;
   
-    @ManyToOne(() => User)
+    @ManyToOne(() => Account)
     @JoinColumn()
-    user: User[];
-  
-    // @OneToMany(() => Comment, comment => comment.user)
-    // @JoinColumn({ name: 'comments'})
-    // comments: Comment[];
-  
-    // @OneToMany(() => PostLikes, post => post.user)
-    // @JoinColumn()
-    // post: PostLikes[];
-  
-    // @ManyToOne(() => Role)
-    // @JoinColumn()
-    // role: Role;
+    account: Account[];
   }
   

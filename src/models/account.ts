@@ -15,8 +15,8 @@ import { Bucket } from "./bucket";
 import { Currency } from "./currency";
 import { UserAuth } from "./users-auth";
   
-  @Entity("users")
-  export class User {
+  @Entity("accounts")
+  export class Account {
     @PrimaryGeneratedColumn("uuid")
     id: number;
   
@@ -51,13 +51,5 @@ import { UserAuth } from "./users-auth";
     
     @OneToMany(() => Bucket, bucket => bucket.user)
     buckets: Bucket[];
-  
-    // @OneToMany(() => PostLikes, post => post.user)
-    // @JoinColumn()
-    // post: PostLikes[];
-  
-    // @ManyToOne(() => Role)
-    // @JoinColumn()
-    // role: Role;
   }
   

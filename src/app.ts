@@ -2,7 +2,7 @@ import * as express from 'express';
 import { RequestHandler } from 'express';
 import Server from './server';
 import connection from './db';
-import AuthRoutes from './auth';
+import AuthRoutes from './chunks/auth';
 
 const app = express();
 const server = new Server(app, connection, 3001);

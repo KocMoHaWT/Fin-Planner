@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { CommonRoutesConfig } from '../commonRoutesConfig';
+import { CommonRoutesConfig } from '../../commonRoutesConfig';
 import { AuthController, IAuthController } from './controller';
 
 interface IAuthRouter {

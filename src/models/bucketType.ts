@@ -11,9 +11,6 @@ import {
     ManyToOne,
     OneToMany,
   } from "typeorm";
-import { Currency } from "./currency";
-import { User } from "./user";
-import { UserAuth } from "./users-auth";
   
   @Entity("bucketsTypes")
   export class BucketType {

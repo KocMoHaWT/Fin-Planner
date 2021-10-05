@@ -13,7 +13,7 @@ import {
   } from "typeorm";
 import { BucketType } from "./bucketType";
 import { Currency } from "./currency";
-import { User } from "./user";
+import { Account } from "./account";
 import { UserAuth } from "./users-auth";
   
   @Entity("buckets")
@@ -43,9 +43,9 @@ import { UserAuth } from "./users-auth";
     @JoinColumn()
     currency: Currency;
   
-    @ManyToOne(() => User, user => user.buckets)
+    @ManyToOne(() => Account, account => account.buckets)
     @JoinColumn()
-    user: User;
+    user: Account;
 
     @ManyToOne(() => BucketType, bucketType => bucketType.id)
     @JoinColumn()
