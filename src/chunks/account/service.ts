@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import Account from "./account";
+import AccountRepository, { IAccountRepository } from "./repository";
 
 export interface IAccountService {
     createAccount: (req: Request, res: Response) => Promise<Response>;
@@ -9,22 +10,27 @@ export interface IAccountService {
 }
 
 export class AccountService {
-    constructor() {}
+    private repository;
+    constructor(repository: IAccountRepository) {
+        this.repository = repository;
+    }
 
     async createAccount(req: Request, res: Response): Promise<Response> {
-        const account = new Account(req.body);
-        return res.status(200).send('heh');
+        await this.repository.create(req.body);
+        return res.status(200);
     }
 
     async updateAccount(req: Request, res: Response): Promise<Response> {
-        return res.status(200).send('heh');
-    }
-
-    async deleteAccount(req: Request, res: Response): Promise<Response> {
-        return res.status(200).send('heh');
+        const result = await this.repository.update(req.body);
+        return res.status(200).json(result);
     }
 
     async getAccount(req: Request, res: Response): Promise<Response> {
-        return res.status(200).send('heh');
+        const acc = req.account.toJSON();
+        return res.status(200).json({
+            account: {
+                ...acc
+            },
+        });
     }
 }

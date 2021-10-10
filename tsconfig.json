@@ -7,7 +7,7 @@
       "sourceMap": true,
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
-      "typeRoots": ["./src/types/custom.d.ts"],
+      "typeRoots": ["./src/interfaces/custom.d.ts"],
       "target": "ES6"
     },
     "exclude": ["node_modules", "**/*.spec.ts"],

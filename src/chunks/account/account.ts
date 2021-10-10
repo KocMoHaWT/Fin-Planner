@@ -5,8 +5,8 @@ export interface IAccount {
     lastName: string;
     email: string;
     password?: string;
-    createdAt: Date;
-    defaultCurrency: any;
+    createdAt?: Date;
+    defaultCurrency?: any;
 }
 
 export default class Account {
@@ -19,21 +19,21 @@ export default class Account {
     // change
     private _defaultCurrency: any;
 
-    constructor(user: IAccount) {
-        this._id = user?.id;
-        this._firstName = user.firstName;
-        this._lastName = user.lastName;
-        this._email = user.email;
-        this._password = user?.password;
-        this._createdAt = user.createdAt;
-        this._defaultCurrency = user.defaultCurrency;
+    constructor(account: IAccount) {
+        this._id = account?.id;
+        this._firstName = account.firstName;
+        this._lastName = account.lastName;
+        this._email = account.email;
+        this._password = account?.password;
+        this._createdAt = account.createdAt;
+        this._defaultCurrency = account.defaultCurrency;
     }
 
     get id() {
         return this._id;
     }
 
-    get user() {
+    toJSON() {
         return { 
             id: this._id, 
             firstName: this._firstName, 
@@ -42,5 +42,11 @@ export default class Account {
             createdAt: this._createdAt, 
             defaultCurrency: this._defaultCurrency 
         };
+    }
+
+    set(account: Partial<IAccount>) {
+        this._firstName = account?.firstName || this._firstName;
+        this._lastName = account?.lastName || this._lastName;
+        this._defaultCurrency = account?.defaultCurrency || this._defaultCurrency;
     }
 }
