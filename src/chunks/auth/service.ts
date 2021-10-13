@@ -1,5 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { TokenType } from "../../interfaces/tokenType";
+import Account from "../account/account";
 import AppleStrategy from "./strategy/appleStrategy";
 import AuthenticationContext from "./strategy/authenticationContext";
 import GoogleStrategy from "./strategy/googleStategy";
@@ -10,6 +11,7 @@ export interface IAuthService {
 }
 
 export class AuthService implements IAuthService{
+    /// userRepo as dependecy
     constructor() {}
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
@@ -36,7 +38,10 @@ export class AuthService implements IAuthService{
 
         try {
             const account = authContext.validate(token);
-            req.account = account;
+            if (typeof account === 'string') {
+                return next();
+            }
+            req.account = account as Account;
             return next();
         } catch (error) {
             return res.status(400).json({ error });

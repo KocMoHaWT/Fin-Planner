@@ -4,3 +4,8 @@ export enum TokenType {
     google = 'googleToken',
     apple = 'appleToken'
 }
+
+export enum JWTType {
+    access = 'access',
+    refresh = 'refresh'
+}
