@@ -2,15 +2,10 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    BeforeInsert,
-    CreateDateColumn,
-    UpdateDateColumn,
-    DeleteDateColumn,
     OneToOne,
     JoinColumn,
-    ManyToOne,
-    OneToMany,
   } from "typeorm";
+import { User } from "./user";
   
   @Entity("users-auth")
   export class UserAuth {
@@ -19,5 +14,15 @@ import {
   
     @Column({ type: "varchar", nullable: true })
     refresh_token: string;
+
+    @Column({ type: "varchar", nullable: true })
+    google_identity: string;
+
+    @Column({ type: "varchar", nullable: true })
+    apple: string;
+
+    @OneToOne(() => User)
+    @JoinColumn()
+    user: User;
   }
   

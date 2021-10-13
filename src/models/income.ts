@@ -11,7 +11,7 @@ import {
     ManyToOne,
     OneToMany,
   } from "typeorm";
-import { Account } from "./account";
+import { User } from "./user";
   
   @Entity("incomes")
   export class Income {
@@ -24,8 +24,8 @@ import { Account } from "./account";
     @Column({ type: "boolean", default: false})
     constant: false;
   
-    @ManyToOne(() => Account)
+    @ManyToOne(() => User)
     @JoinColumn()
-    account: Account[];
+    account: User[];
   }
   
