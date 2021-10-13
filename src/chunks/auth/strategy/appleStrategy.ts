@@ -1,10 +1,10 @@
 import { IAuthentication } from "../../../interfaces/authentication";
 import { testAcc } from "../../../utils/testAcc";
-import Account from "../../account/account";
+import Account from "../../user/user";
 
 
 export default class AppleStrategy implements IAuthentication {
     validate(token: string) {
-        return new Account({...testAcc})
+        return Promise.resolve(new Account({...testAcc}));
     }
 }

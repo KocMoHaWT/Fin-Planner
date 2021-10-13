@@ -1,19 +1,20 @@
 import { IAuthentication } from "../../../interfaces/authentication";
 import { testAcc } from "../../../utils/testAcc";
-import Account from "../../account/account";
+import Account from "../../user/user";
 import * as jwt from "jsonwebtoken";
 import envs from '../../../config';
 import { JWTType } from "../../../interfaces/tokenType";
 
 export default class JWTStrategy implements IAuthentication {
-    validate(token: string) {
+    validate(token: string): Promise<number> {
         try {
-            jwt.verify(token, envs.jwtSecret as string, { ignoreExpiration: false }) as { payload: string };
+            const tokenData = jwt.verify(token, envs.jwtSecret as string, { ignoreExpiration: false }) as { id: number };
 
+            return Promise.resolve(tokenData.id)
         } catch {
-            throw new Error('invalid token');
+            return Promise.reject(0);
         }
-        return true;
+      
     }
 
     async createToken(id: number, type: JWTType) {

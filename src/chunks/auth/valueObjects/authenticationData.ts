@@ -10,8 +10,7 @@ interface IAuthData {
 export default class AuthenticationData {
     public email;
     public password;
-    public firstName;
-    public lastName;
+    public name;
 
     constructor({ email, password, firstName, lastName }: IAuthData) {
         if (!this.validateEmail(email) || !this.validatePassword(password)) {
@@ -19,8 +18,7 @@ export default class AuthenticationData {
         }
         this.email = email;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = firstName;
     }
 
     validateEmail(email: string) {
@@ -32,6 +30,6 @@ export default class AuthenticationData {
     }
 
     toJSON() {
-        return { email: this.email, password: this.password, firstName: this.firstName, lastName: this.lastName}
+        return { email: this.email, password: this.password, name: this.name }
     }
 }

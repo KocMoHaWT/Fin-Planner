@@ -1,9 +1,9 @@
-import Account from "../chunks/account/account";
+import User from "../chunks/user/user";
 
 declare global {
   namespace Express {
       export interface Request {
-          account: Account;
+          user: User;
       }
   }
 } 

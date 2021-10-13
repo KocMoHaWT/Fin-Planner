@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { TokenType } from "../../interfaces/tokenType";
-import Account from "../account/account";
+import Account from "../user/user";
 import AppleStrategy from "./strategy/appleStrategy";
 import AuthenticationContext from "./strategy/authenticationContext";
 import GoogleStrategy from "./strategy/googleStategy";
@@ -37,11 +37,11 @@ export class AuthService implements IAuthService{
         }
 
         try {
-            const account = authContext.validate(token);
-            if (typeof account === 'string') {
+            const account = await authContext.validate(token);
+            if (typeof account === 'number') {
                 return next();
             }
-            req.account = account as Account;
+            req.user = account as Account;
             return next();
         } catch (error) {
             return res.status(400).json({ error });

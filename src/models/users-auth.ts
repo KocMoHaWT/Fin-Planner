@@ -16,10 +16,10 @@ import { User } from "./user";
     refresh_token: string;
 
     @Column({ type: "varchar", nullable: true })
-    google_identity: string;
+    googleIdentity: string;
 
     @Column({ type: "varchar", nullable: true })
-    apple: string;
+    appleIidentity: string;
 
     @OneToOne(() => User)
     @JoinColumn()
