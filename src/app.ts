@@ -3,12 +3,14 @@ import { RequestHandler } from 'express';
 import Server from './server';
 import connection from './db';
 import AuthRoutes from './chunks/auth';
+import UserRouter from './chunks/user';
 
 const app = express();
 const server = new Server(app, connection, 3001);
 
 const routes = [
-    AuthRoutes
+    AuthRoutes,
+    UserRouter
 ]
 
 const globalMiddleware: Array<RequestHandler> = [

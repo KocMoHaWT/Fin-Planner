@@ -21,10 +21,7 @@ import { UserAuth } from "./users-auth";
     id: number;
   
     @Column({ type: "varchar", length: 200, nullable: false })
-    firstName: string;
-  
-    @Column({ type: "varchar", length: 200, nullable: false })
-    lastName: string;
+    name: string;
   
     @Column({ type: "varchar", length: 200, nullable: false })
     email: string;

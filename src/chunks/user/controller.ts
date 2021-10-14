@@ -5,7 +5,6 @@ export interface IUserController {
     create: (req: Request, res: Response ) => Promise<any>;
     update: (req: Request, res: Response ) => Promise<any>;
     read: (req: Request, res: Response ) => Promise<any>;
-    delete: (req: Request, res: Response ) => Promise<any>;
 }
 
 export class UserController implements IUserController {
@@ -16,15 +15,12 @@ export class UserController implements IUserController {
     }
 
     async create(req: Request, res: Response ) {
+        console.log('sd');
         return this.service.createUser(req, res);
     }
 
     async read(req: Request, res: Response ) {
         return this.service.getUser(req, res);
-    }
-
-    async delete(req: Request, res: Response ) {
-        return this.service.deleteUser(req, res);
     }
 
     async update(req: Request, res: Response ) {

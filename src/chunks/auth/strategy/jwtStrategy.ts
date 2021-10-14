@@ -6,6 +6,10 @@ import envs from '../../../config';
 import { JWTType } from "../../../interfaces/tokenType";
 
 export default class JWTStrategy implements IAuthentication {
+    // jwtFactory: 
+    constructor() {
+
+    }
     validate(token: string): Promise<number> {
         try {
             const tokenData = jwt.verify(token, envs.jwtSecret as string, { ignoreExpiration: false }) as { id: number };
@@ -17,9 +21,9 @@ export default class JWTStrategy implements IAuthentication {
       
     }
 
-    async createToken(id: number, type: JWTType) {
-        return jwt.sign({ payload: id }, envs.jwtSecret, {
-            expiresIn: type === JWTType.access ? envs.accessExpire : envs.refreshExpire,
-          });
-    }
+    // async createToken(id: number, type: JWTType) {
+    //     return jwt.sign({ payload: id }, envs.jwtSecret, {
+    //         expiresIn: type === JWTType.access ? envs.accessExpire : envs.refreshExpire,
+    //       });
+    // }
 }

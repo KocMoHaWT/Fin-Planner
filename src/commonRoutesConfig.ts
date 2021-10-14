@@ -10,6 +10,11 @@ export abstract class CommonRoutesConfig {
         this.name = name;
         this.comonPath = commonPath;
     }
+
+    get path() {
+        return this.comonPath;
+    } 
+    
     getName() {
         return this.name;
     }

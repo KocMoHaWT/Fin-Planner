@@ -27,7 +27,7 @@ export default class Server {
 
     public loadRoutes(routes: Array<any>): void {
         routes.forEach(route => {
-            this.app.use(route.configureRoutes());
+            this.app.use(route.path, route.configureRoutes());
         });
     };
 

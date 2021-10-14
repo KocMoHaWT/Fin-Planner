@@ -4,10 +4,10 @@ import AuthData from "../auth/valueObjects/authenticationData";
 import User, { IUser } from "./user";
 
 export interface IUserRepository {
-    create: (User: AuthData) => Promise<void>;
-    update: (User: User) => Promise<IUser>;
+    create: (User: AuthData) => Promise<User>;
+    update: (User: User) => Promise<void>;
     isUserExists: (email: string) => Promise<boolean>;
-    findById: (id: number) => Promise<IUser>;
+    findById: (id: number) => Promise<User>;
 }
 
 const TokenByType = {
@@ -23,30 +23,28 @@ export default class UserRepository implements IUserRepository {
         this.manager = mangager;
     }
 
-    async create(User: AuthData): Promise<void> {
-        await this.manager().query(
+    async create(user: AuthData): Promise<User> {
+        const res = await this.manager().query(
             `
         INSERT INTO users (name, email, password)
         VALUES ($1, $2, $3);
     `,
-            [User.name, User.email, User.password]
+            [user.name, user.email, user.password]
         )
+        return res;
     }
 
-    async update(User: User): Promise<IUser> {
-        const simpleUser = User.toJSON();
+    async update(user: User): Promise<void> {
+        const simpleUser = user.toJSON();
         const res = await getManager().query(
             `
         UPDATED users
-        SET firstName=$1, lastName=$2, defaultCurrency=$3
+        SET name=$1, defaultCurrency=$2
         WHERE id=$1
     `,
-            [simpleUser.firstName, simpleUser.lastName, simpleUser.defaultCurrency]
+            [simpleUser.name, simpleUser.defaultCurrency]
         )
-        if (res.length) {
-            return res[0];
-        }
-        return null;
+        return res;
     };
 
     async isUserExists(email: string): Promise<boolean> {
@@ -59,7 +57,7 @@ export default class UserRepository implements IUserRepository {
         return res.pop();
     }
 
-    async findById(id: number): Promise<IUser> {
+    async findById(id: number): Promise<User> {
         const res = await getManager().query(
             `
         SELECT * FROM users WHERE id=$1;
@@ -67,11 +65,25 @@ export default class UserRepository implements IUserRepository {
             [id]
         )
         if (res.length) {
-            return res[0];
+            return new User(res[0]);
         }
         return null;
     }
 
+    saveRefreshToken = async (
+        refreshToken: string,
+        id: string
+    ): Promise<void> => {
+        await getManager().query(
+            `
+          UPDATE users 
+          SET refreshToken = $1
+          WHERE id = $2
+        `,
+            [refreshToken, id]
+        );
+    };
+    // swith to auth repo
     async addIdentity(id: number, identity: string, type: Identity): Promise<void> {
         await getManager().query(
             `

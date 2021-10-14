@@ -13,6 +13,6 @@ export class AuthController implements IAuthController {
     }
 
      async kek(req: Request, res: Response ) {
-        return this.service.test(req, res);
+        return {};
     }
 }

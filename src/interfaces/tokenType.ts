@@ -1,6 +1,5 @@
 export enum TokenType { 
-    refresh = 'refreshToken',
-    access = 'accessToken',
+    jwt = 'jwtToken',
     google = 'googleToken',
     apple = 'appleToken'
 }
