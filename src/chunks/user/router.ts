@@ -1,24 +1,32 @@
 import * as express from 'express';
+import InjectableContainer from '../../application/InjectableContainer';
 import { CommonRoutesConfig } from '../../commonRoutesConfig';
+import { IAuthService } from '../auth/service';
 import { IUserController } from './controller';
 
 interface IUserRouter {
-    controller: IUserController;
+    userController: IUserController;
     router?: express.Router;
     localMiddlewares?: [];
-    commonPath: string
+    commonPath: string;
+    authService: IAuthService;
 }
 
 export class UserRouter extends CommonRoutesConfig {
-    private controller: IUserController;
-    constructor({ controller, commonPath = '', router = express.Router()} : IUserRouter) {
+    private userController: IUserController;
+    private authService: IAuthService;
+    constructor({ userController, commonPath = '', router = express.Router(), authService} : IUserRouter) {
         super(router, 'Authrouter', commonPath);
-        this.controller = controller
+        this.userController = userController
+        this.authService = authService;
     }
 
     configureRoutes() {
-        this.router.get('/:id', [this.controller.read.bind(this.controller)]);
-        this.router.post('/', [this.controller.create.bind(this.controller)]);
+        this.router.get('/:id', [this.authService.middleware, this.userController.read.bind(this.userController)]);
+        this.router.post('/', [this.userController.create.bind(this.userController)]);
         return this.router;
     }
 }
+
+
+InjectableContainer.setDependency(UserRouter, 'userRouter', ['userController', 'authService']);

@@ -7,14 +7,18 @@ import GoogleStrategy from "./strategy/googleStategy";
 import JWTStrategy from "./strategy/jwtStrategy";
 import * as jwt from "jsonwebtoken";
 import envs from '../../config';
+import { IUserService, UserService } from "../user/service";
+import InjectableContainer from "../../application/InjectableContainer";
 
 export interface IAuthService {
     middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>
 }
 
 export class AuthService implements IAuthService {
-    /// userRepo as dependecy
-    constructor() { }
+    private userService: IUserService;
+    constructor({ userService }: { userService: IUserService }) {
+        this.userService = userService;
+    }
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
         let authContext = new AuthenticationContext();
@@ -34,7 +38,7 @@ export class AuthService implements IAuthService {
                 authContext.setStrategy(new AppleStrategy());
                 break;
             default:
-                authContext.setStrategy(new JWTStrategy());
+                authContext.setStrategy(new JWTStrategy(this.userService.getUser));
                 break;
         }
 
@@ -51,9 +55,15 @@ export class AuthService implements IAuthService {
         }
     }
 
-    async createToken(id: number, type: JWTType) {
-        return jwt.sign({ id, type }, envs.jwtSecret, {
-            expiresIn: type === JWTType.access ? envs.accessExpire : envs.refreshExpire,
+    async createPairOfTokens(id: number) {
+        const accessToken = await jwt.sign({ id }, envs.jwtSecret, {
+            expiresIn: envs.accessExpire,
         });
+        const refreshToken = await jwt.sign({ id }, envs.jwtSecret, {
+            expiresIn: envs.refreshExpire,
+        });
+        return { accessToken, refreshToken }
     }
 }
+
+InjectableContainer.setDependency(AuthService, 'authService', ['userService']);

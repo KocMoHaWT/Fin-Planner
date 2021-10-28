@@ -6,15 +6,15 @@ import envs from '../../../config';
 import { JWTType } from "../../../interfaces/tokenType";
 
 export default class JWTStrategy implements IAuthentication {
-    // jwtFactory: 
-    constructor() {
-
+    getUser: any;
+    constructor(getUser: any) {
+        this.getUser = getUser;
     }
-    validate(token: string): Promise<number> {
+    async validate(token: string): Promise<number> {
         try {
             const tokenData = jwt.verify(token, envs.jwtSecret as string, { ignoreExpiration: false }) as { id: number };
-
-            return Promise.resolve(tokenData.id)
+            const user = await this.getUser(tokenData.id);
+            return user;
         } catch {
             return Promise.reject(0);
         }

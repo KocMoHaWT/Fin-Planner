@@ -4,13 +4,14 @@ import Server from './server';
 import connection from './db';
 import AuthRoutes from './chunks/auth';
 import UserRouter from './chunks/user';
+import InjectableContainer from './application/InjectableContainer';
 
 const app = express();
 const server = new Server(app, connection, 3001);
 
 const routes = [
     AuthRoutes,
-    UserRouter
+    UserRouter,
 ]
 
 const globalMiddleware: Array<RequestHandler> = [
@@ -22,6 +23,7 @@ const globalMiddleware: Array<RequestHandler> = [
 Promise.resolve()
     .then(() => server.initDatabase())
     .then(() => {
+        InjectableContainer.initialise();
         server.loadGlobalMiddleware(globalMiddleware);
         server.loadRoutes(routes)
         server.run();

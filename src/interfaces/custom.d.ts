@@ -1,4 +1,5 @@
 import User from "../chunks/user/user";
+import { Request } from 'express';
 
 declare global {
   namespace Express {

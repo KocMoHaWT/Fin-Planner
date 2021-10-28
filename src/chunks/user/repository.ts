@@ -1,4 +1,5 @@
 import { EntityManager, getManager } from "typeorm";
+import InjectableContainer from "../../application/InjectableContainer";
 import { TokenType } from "../../interfaces/tokenType";
 import AuthData from "../auth/valueObjects/authenticationData";
 import User, { IUser } from "./user";
@@ -19,8 +20,8 @@ type Identity = TokenType.apple | TokenType.google;
 export default class UserRepository implements IUserRepository {
     private manager: typeof getManager;
 
-    constructor(mangager: typeof getManager) {
-        this.manager = mangager;
+    constructor({ manager }: { manager: typeof getManager }) {
+        this.manager = manager;
     }
 
     async create(user: AuthData): Promise<User> {
@@ -96,3 +97,7 @@ export default class UserRepository implements IUserRepository {
         return null;
     }
 }
+
+InjectableContainer.setDependency(UserRepository, 'userRepository', ['manager']);
+
+InjectableContainer.setDependency(getManager, 'manager', []);

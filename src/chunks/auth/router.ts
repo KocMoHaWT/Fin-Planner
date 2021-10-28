@@ -1,9 +1,10 @@
 import * as express from 'express';
+import InjectableContainer from '../../application/InjectableContainer';
 import { CommonRoutesConfig } from '../../commonRoutesConfig';
 import { AuthController, IAuthController } from './controller';
 
 interface IAuthRouter {
-    controller: IAuthController;
+    authController: IAuthController;
     router?: express.Router;
     localMiddlewares?: [];
     commonPath: string
@@ -11,9 +12,9 @@ interface IAuthRouter {
 
 export class AuthRouter extends CommonRoutesConfig {
     private controller: IAuthController;
-    constructor({ controller, commonPath =  '', router = express.Router()} : IAuthRouter) {
+    constructor({ authController, commonPath =  '', router = express.Router()} : IAuthRouter) {
         super(router, 'Authrouter', commonPath);
-        this.controller = controller
+        this.controller = authController
     }
 
     configureRoutes() {
@@ -21,3 +22,5 @@ export class AuthRouter extends CommonRoutesConfig {
         return this.router;
     }
 }
+
+InjectableContainer.setDependency(AuthRouter, 'authRouter', ['authController']);
