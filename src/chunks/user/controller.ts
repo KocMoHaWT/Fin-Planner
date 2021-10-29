@@ -13,7 +13,6 @@ export class UserController implements IUserController {
     private service: IUserService;
 
     constructor({ userService }: { userService: IUserService }) {
-        ;
         this.service = userService;
     }
 
@@ -30,4 +29,8 @@ export class UserController implements IUserController {
     }
 }
 
-InjectableContainer.setDependency(UserController, 'userController', ['userService'])
+const init = new Promise(() => {
+    InjectableContainer.setDependency(UserController, 'userController', ['userService']);
+});
+
+export default init;

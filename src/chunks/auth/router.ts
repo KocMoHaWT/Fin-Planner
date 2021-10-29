@@ -14,7 +14,7 @@ export class AuthRouter extends CommonRoutesConfig {
     private controller: IAuthController;
     constructor({ authController, commonPath =  '', router = express.Router()} : IAuthRouter) {
         super(router, 'Authrouter', commonPath);
-        this.controller = authController
+        this.controller = authController;
     }
 
     configureRoutes() {
@@ -23,4 +23,8 @@ export class AuthRouter extends CommonRoutesConfig {
     }
 }
 
-InjectableContainer.setDependency(AuthRouter, 'authRouter', ['authController']);
+const init = new Promise(() => {
+    InjectableContainer.setDependency(AuthRouter, 'authRouter', ['authController']);
+});
+
+export default init;

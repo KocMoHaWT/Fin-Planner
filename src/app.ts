@@ -2,17 +2,14 @@ import * as express from 'express';
 import { RequestHandler } from 'express';
 import Server from './server';
 import connection from './db';
-import AuthRoutes from './chunks/auth';
-import UserRouter from './chunks/user';
 import InjectableContainer from './application/InjectableContainer';
+import autInit from './chunks/auth';
+import userInit from './chunks/user';
+
+const routers = ['authRouter', 'userRouter'];
 
 const app = express();
 const server = new Server(app, connection, 3001);
-
-const routes = [
-    AuthRoutes,
-    UserRouter,
-]
 
 const globalMiddleware: Array<RequestHandler> = [
     express.urlencoded({ extended: false }),
@@ -23,8 +20,11 @@ const globalMiddleware: Array<RequestHandler> = [
 Promise.resolve()
     .then(() => server.initDatabase())
     .then(() => {
-        InjectableContainer.initialise();
+       Promise.all([ ...userInit, ...autInit])
+    })
+    .then(() => {
         server.loadGlobalMiddleware(globalMiddleware);
-        server.loadRoutes(routes)
+        InjectableContainer.initialise();
+        server.loadRoutes(routers)
         server.run();
     });

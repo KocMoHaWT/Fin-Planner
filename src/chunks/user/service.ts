@@ -10,14 +10,14 @@ import InjectableContainer from "../../application/InjectableContainer";
 export interface IUserService {
     createUser: (req: Request, res: Response) => Promise<void | Response<any, Record<string, any>>>;
     updateUser: (req: Request, res: Response) => Promise<Response>;
-    getUser: (id: number) =>  Promise<User>;
+    getUser: (id: number) => Promise<User>;
     sendUserToFront: (req: CustomRequest, res: Response) => Promise<Response<IUser>>;
 }
 
 export class UserService {
     private repository;
-    constructor(repository: IUserRepository) {
-        this.repository = repository;
+    constructor({ userRepository }: { userRepository: IUserRepository }) {
+        this.repository = userRepository;
     }
 
     async createUser(req: Request, res: Response) {
@@ -26,7 +26,7 @@ export class UserService {
         const user = await this.repository.create(req.body);
         const accessToken = await jwt.sign({ id: user.id, type: TokenType.jwt }, envs.jwtSecret, {
             expiresIn: envs.accessExpire,
-        }); 
+        });
         const refreshToken = await jwt.sign({ id: user.id, type: TokenType.jwt }, envs.jwtSecret, {
             expiresIn: envs.refreshExpire,
         });
@@ -52,4 +52,9 @@ export class UserService {
     }
 }
 
-InjectableContainer.setDependency(UserService, 'userService', ['userRepository'])
+
+const init = new Promise(() => {
+    InjectableContainer.setDependency(UserService, 'userService', ['userRepository']);
+});
+
+export default init;

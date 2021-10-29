@@ -15,7 +15,7 @@ interface IUserRouter {
 export class UserRouter extends CommonRoutesConfig {
     private userController: IUserController;
     private authService: IAuthService;
-    constructor({ userController, commonPath = '', router = express.Router(), authService} : IUserRouter) {
+    constructor({ userController, commonPath = '/users', router = express.Router(), authService} : IUserRouter) {
         super(router, 'Authrouter', commonPath);
         this.userController = userController
         this.authService = authService;
@@ -29,4 +29,8 @@ export class UserRouter extends CommonRoutesConfig {
 }
 
 
-InjectableContainer.setDependency(UserRouter, 'userRouter', ['userController', 'authService']);
+const init = new Promise(() => {
+    InjectableContainer.setDependency(UserRouter, 'userRouter', ['userController', 'authService']);
+});
+
+export default init;

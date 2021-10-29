@@ -1,5 +1,6 @@
 import { Application, RequestHandler } from 'express';
 import * as http from 'http';
+import InjectableContainer from './application/InjectableContainer';
 
 export default class Server {
     private app: Application;
@@ -27,7 +28,7 @@ export default class Server {
 
     public loadRoutes(routes: Array<any>): void {
         routes.forEach(route => {
-            this.app.use(route.path, route.configureRoutes());
+            this.app.use(InjectableContainer.getDepency(route).path, InjectableContainer.getDepency(route).configureRoutes());
         });
     };
 

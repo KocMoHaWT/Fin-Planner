@@ -17,7 +17,7 @@ const TokenByType = {
 }
 type Identity = TokenType.apple | TokenType.google;
 
-export default class UserRepository implements IUserRepository {
+export class UserRepository implements IUserRepository {
     private manager: typeof getManager;
 
     constructor({ manager }: { manager: typeof getManager }) {
@@ -37,7 +37,7 @@ export default class UserRepository implements IUserRepository {
 
     async update(user: User): Promise<void> {
         const simpleUser = user.toJSON();
-        const res = await getManager().query(
+        const res = await this.manager().query(
             `
         UPDATED users
         SET name=$1, defaultCurrency=$2
@@ -49,7 +49,7 @@ export default class UserRepository implements IUserRepository {
     };
 
     async isUserExists(email: string): Promise<boolean> {
-        const res = await getManager().query(
+        const res = await this.manager().query(
             `
         SELECT * FROM users WHERE email=$1;
     `,
@@ -59,7 +59,7 @@ export default class UserRepository implements IUserRepository {
     }
 
     async findById(id: number): Promise<User> {
-        const res = await getManager().query(
+        const res = await this.manager().query(
             `
         SELECT * FROM users WHERE id=$1;
     `,
@@ -86,7 +86,7 @@ export default class UserRepository implements IUserRepository {
     };
     // swith to auth repo
     async addIdentity(id: number, identity: string, type: Identity): Promise<void> {
-        await getManager().query(
+        this.manager().query(
             `
         UPDATE users-auth
         SET ${TokenByType[type]}=$1
@@ -98,6 +98,11 @@ export default class UserRepository implements IUserRepository {
     }
 }
 
-InjectableContainer.setDependency(UserRepository, 'userRepository', ['manager']);
+const init = new Promise(() => {
+    InjectableContainer.setDependency(UserRepository, 'userRepository', ['manager']);
 
-InjectableContainer.setDependency(getManager, 'manager', []);
+    /// get another place for this one
+    InjectableContainer.setDependency(getManager, 'manager', []);
+})
+
+export default init;

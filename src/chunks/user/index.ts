@@ -1,16 +1,8 @@
-import { UserController } from "./controller";
-import { UserRouter } from "./router";
-import { UserService } from "./service";
-import { authService } from '../auth';
-import UserRepository from "./repository";
-import { getManager } from "typeorm";
+import UserRepositoryInit from './repository';
+import UserServiceInit from './service';
+import UserRouterInit from './router';
+import UserControllerInit from './controller';
 
-const repository = new UserRepository(getManager);
-export const userService = new UserService(repository);
-const userController = new UserController(userService);
+const init = [UserRepositoryInit,UserServiceInit, UserControllerInit, UserRouterInit];
 
-const commonPath = '/users';
-const userRouter = new UserRouter({ userController, commonPath, authService });
-
-
-export default userRouter;
+export default init;

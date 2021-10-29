@@ -19,4 +19,8 @@ export class AuthController implements IAuthController {
     }
 }
 
-InjectableContainer.setDependency(AuthController, 'authController', ['authService'])
+const init = new Promise(() => {
+    InjectableContainer.setDependency(AuthController, 'authController', ['authService']);
+});
+
+export default init;
