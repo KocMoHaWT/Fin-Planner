@@ -21,32 +21,17 @@ export class AuthService implements IAuthService {
     }
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
-        let authContext = new AuthenticationContext();
-        const type = req.body.type;
+        let authContext = new JWTStrategy(this.userService.getUser.bind(this.userService));
+        // const type = req.body.type;
         const authHeader = req.headers["authorization"];
         const token = authHeader && authHeader.split(" ")[1];
 
-        if (!type || !token) {
+        if (!token) {
             return res.status(401).end();
-        }
-
-        switch (type) {
-            case TokenType.google:
-                authContext.setStrategy(new GoogleStrategy());
-                break;
-            case TokenType.apple:
-                authContext.setStrategy(new AppleStrategy());
-                break;
-            default:
-                authContext.setStrategy(new JWTStrategy(this.userService.getUser));
-                break;
         }
 
         try {
             const user = await authContext.validate(token);
-            if (typeof user === 'number') {
-                return next();
-            }
             //@ts-ignore
             req.user = user;
             return next();

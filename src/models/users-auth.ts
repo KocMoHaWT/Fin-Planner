@@ -9,7 +9,7 @@ import { User } from "./user";
   
   @Entity("users-auth")
   export class UserAuth {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: number;
   
     @Column({ type: "varchar", nullable: true })

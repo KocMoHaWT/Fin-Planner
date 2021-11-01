@@ -18,7 +18,7 @@ import { UserAuth } from "./users-auth";
   
   @Entity("buckets")
   export class Bucket {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: number;
   
     @Column({ type: "varchar", length: 200, nullable: false })

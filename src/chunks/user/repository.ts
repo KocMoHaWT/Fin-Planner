@@ -5,10 +5,12 @@ import AuthData from "../auth/valueObjects/authenticationData";
 import User, { IUser } from "./user";
 
 export interface IUserRepository {
-    create: (User: AuthData) => Promise<User>;
+    create: (User: AuthData) => Promise<void>;
     update: (User: User) => Promise<void>;
-    isUserExists: (email: string) => Promise<boolean>;
+    isUserExists: (email: string) => Promise<User>;
+    verifyUser: (email: string, password: string) => Promise<User>;
     findById: (id: number) => Promise<User>;
+    findByEmail: (email: string) => Promise<{ id: number }>;
 }
 
 const TokenByType = {
@@ -24,15 +26,38 @@ export class UserRepository implements IUserRepository {
         this.manager = manager;
     }
 
-    async create(user: AuthData): Promise<User> {
-        const res = await this.manager().query(
+    async create(user: AuthData): Promise<void> {
+        await this.manager().query(
             `
         INSERT INTO users (name, email, password)
         VALUES ($1, $2, $3);
     `,
             [user.name, user.email, user.password]
         )
-        return res;
+    }
+
+    async verifyUser(email: string, password: string): Promise<User> {
+        const res = await this.manager().query(
+            `
+        SELECT * FROM users WHERE email=$1 AND password = $2;
+    `,
+            [email, password]
+        )
+        if (res.length) {
+            return new User(res[0]);
+        }
+        return null;
+    }
+
+    async findByEmail(email: string): Promise<{ id: number }> {
+        const res = await this.manager().query(
+            `
+       SELECT id FROM users
+        WHERE email = $1;
+    `,
+            [email]
+        )
+        return res.pop();
     }
 
     async update(user: User): Promise<void> {
@@ -48,7 +73,7 @@ export class UserRepository implements IUserRepository {
         return res;
     };
 
-    async isUserExists(email: string): Promise<boolean> {
+    async isUserExists(email: string): Promise<User> {
         const res = await this.manager().query(
             `
         SELECT * FROM users WHERE email=$1;

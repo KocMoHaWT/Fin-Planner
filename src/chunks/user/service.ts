@@ -10,6 +10,7 @@ import InjectableContainer from "../../application/InjectableContainer";
 export interface IUserService {
     createUser: (req: Request, res: Response) => Promise<void | Response<any, Record<string, any>>>;
     updateUser: (req: Request, res: Response) => Promise<Response>;
+    loginUser: (req: Request, res: Response) => Promise<Response>;
     getUser: (id: number) => Promise<User>;
     sendUserToFront: (req: CustomRequest, res: Response) => Promise<Response<IUser>>;
 }
@@ -22,12 +23,32 @@ export class UserService {
 
     async createUser(req: Request, res: Response) {
         const isExists = await this.repository.isUserExists(req.body.email);
-        if (isExists) return res.status(409).end();
-        const user = await this.repository.create(req.body);
-        const accessToken = await jwt.sign({ id: user.id, type: TokenType.jwt }, envs.jwtSecret, {
+        if (!isExists) return res.status(409).end();
+        await this.repository.create(req.body);
+        const user = await this.repository.findByEmail(req.body.email);
+        const accessToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
             expiresIn: envs.accessExpire,
         });
-        const refreshToken = await jwt.sign({ id: user.id, type: TokenType.jwt }, envs.jwtSecret, {
+        const refreshToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
+            expiresIn: envs.refreshExpire,
+        });
+        return res.status(200).json({
+            accessToken,
+            refreshToken,
+        });
+    }
+
+    async loginUser(req: Request, res: Response) {
+        if (!req.body.email || !req.body.password ) {
+            return res.status(409).end();
+        }
+        const user = await this.repository.verifyUser(req.body.email, req.body.password);
+        
+        if (!user) return res.status(409).end();
+        const accessToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
+            expiresIn: envs.accessExpire,
+        });
+        const refreshToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
             expiresIn: envs.refreshExpire,
         });
         return res.status(200).json({

@@ -17,7 +17,7 @@ import { Bucket } from "./bucket";
   
   @Entity("tags")
   export class Tag {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ type: "varchar", length: 200, nullable: false })

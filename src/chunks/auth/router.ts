@@ -12,7 +12,7 @@ interface IAuthRouter {
 
 export class AuthRouter extends CommonRoutesConfig {
     private controller: IAuthController;
-    constructor({ authController, commonPath =  '', router = express.Router()} : IAuthRouter) {
+    constructor({ authController, commonPath =  '/auth', router = express.Router()} : IAuthRouter) {
         super(router, 'Authrouter', commonPath);
         this.controller = authController;
     }

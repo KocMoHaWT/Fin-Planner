@@ -22,8 +22,9 @@ export class UserRouter extends CommonRoutesConfig {
     }
 
     configureRoutes() {
-        this.router.get('/:id', [this.authService.middleware, this.userController.read.bind(this.userController)]);
         this.router.post('/', [this.userController.create.bind(this.userController)]);
+        this.router.post('/login', [this.userController.login.bind(this.userController)]);
+        this.router.get('/:id', [this.authService.middleware.bind(this.authService), this.userController.read.bind(this.userController)]);
         return this.router;
     }
 }

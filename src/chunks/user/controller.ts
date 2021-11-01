@@ -7,6 +7,7 @@ export interface IUserController {
     create: (req: Request, res: Response) => Promise<any>;
     update: (req: Request, res: Response) => Promise<any>;
     read: (req: Request, res: Response) => Promise<any>;
+    login: (req: Request, res: Response) => Promise<any>;
 }
 
 export class UserController implements IUserController {
@@ -14,6 +15,11 @@ export class UserController implements IUserController {
 
     constructor({ userService }: { userService: IUserService }) {
         this.service = userService;
+    }
+
+    async login(req: Request, res: Response) {
+        console.log('here');
+        return this.service.loginUser(req, res);
     }
 
     async create(req: Request, res: Response) {

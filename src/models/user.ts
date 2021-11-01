@@ -17,7 +17,7 @@ import { UserAuth } from "./users-auth";
   
   @Entity("users")
   export class User {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: number;
   
     @Column({ type: "varchar", length: 200, nullable: false })

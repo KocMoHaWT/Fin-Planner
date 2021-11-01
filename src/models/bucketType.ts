@@ -14,7 +14,7 @@ import {
   
   @Entity("bucketsTypes")
   export class BucketType {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: number;
   
     @Column({ type: "varchar", length: 200, nullable: false })

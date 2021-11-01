@@ -15,7 +15,7 @@ import { User } from "./user";
   
   @Entity("incomes")
   export class Income {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: number;
   
     @Column({ type: "varchar", length: 200, nullable: false })

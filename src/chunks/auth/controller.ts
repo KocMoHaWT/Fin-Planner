@@ -10,7 +10,6 @@ export class AuthController implements IAuthController {
     private service: IAuthService;
 
     constructor({ authService }: { authService: IAuthService }) {
-        ;
         this.service = authService;
     }
 
