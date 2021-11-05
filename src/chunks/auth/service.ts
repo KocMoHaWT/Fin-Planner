@@ -1,15 +1,15 @@
 import { Response, Request, NextFunction } from "express";
 import { JWTType, TokenType } from "../../interfaces/tokenType";
 import User from "../user/user";
-import AppleStrategy from "./strategy/appleStrategy";
-import AuthenticationContext from "./strategy/authenticationContext";
-import GoogleStrategy from "./strategy/googleStategy";
-import JWTStrategy from "./strategy/authStrategy";
+import AppleStrategy from "./strategies/appleStrategy";
+import AuthenticationContext from "./strategies/authenticationContext";
+import GoogleStrategy from "./strategies/googleStategy";
+import JWTStrategy from "./strategies/authStrategy";
 import * as jwt from "jsonwebtoken";
 import envs from '../../config';
 import { IUserService, UserService } from "../user/service";
 import InjectableContainer from "../../application/InjectableContainer";
-import AuthStrategy from "./strategy/authStrategy";
+import AuthStrategy from "./strategies/authStrategy";
 
 export interface IAuthService {
     middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>
@@ -22,7 +22,6 @@ export class AuthService implements IAuthService {
     }
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
-        let authContext = new JWTStrategy(this.userService.getUser.bind(this.userService));
         // const type = req.body.type;
         const authHeader = req.headers["authorization"];
         const token = authHeader && authHeader.split(" ")[1];
