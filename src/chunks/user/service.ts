@@ -6,6 +6,10 @@ import envs from '../../config';
 import { TokenType } from "../../interfaces/tokenType";
 import { CustomRequest } from "../../interfaces/request";
 import InjectableContainer from "../../application/InjectableContainer";
+import AuthenticationContext from "./strategy/authenticationContext";
+import AuthStrategy from "./strategy/AuthStrategy";
+import GoogleStrategy from "./strategy/googleStategy";
+import AppleStrategy from "./strategy/appleStrategy";
 
 export interface IUserService {
     createUser: (req: Request, res: Response) => Promise<void | Response<any, Record<string, any>>>;
@@ -39,10 +43,29 @@ export class UserService {
     }
 
     async loginUser(req: Request, res: Response) {
-        if (!req.body.email || !req.body.password ) {
+        let authContext = new AuthenticationContext();
+        const tokenInBody = req.body?.token;
+        if ((!req.body.email || !req.body.password) && !tokenInBody) {
             return res.status(409).end();
         }
-        const user = await this.repository.verifyUser(req.body.email, req.body.password);
+
+        switch (tokenInBody) {
+            case TokenType.google:
+                authContext.setStrategy(new GoogleStrategy({ userService: this as IUserService}));
+                break;
+            case TokenType.apple:
+                authContext.setStrategy(new AppleStrategy());
+                break;
+            default:
+                authContext.setStrategy(new AuthStrategy({ repository: this.repository}));
+                break;
+        }
+        let user 
+        if (tokenInBody) {
+            user = await authContext.verifyByToken(tokenInBody);
+        } else {
+            user = await authContext.verifyByCredentials(req.body.email, req.body?.passowrd);
+        }
         
         if (!user) return res.status(409).end();
         const accessToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {

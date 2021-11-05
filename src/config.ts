@@ -12,5 +12,6 @@ export default {
   password: process.env.password || "ha-ha",
   database: process.env.database || "fin-planner",
   port: 5432,
-  jwtSecret: process.env.jwtSecret
+  jwtSecret: process.env.jwtSecret,
+  googleId: process.env.googleId,
 };

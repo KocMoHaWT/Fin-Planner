@@ -1,10 +1,10 @@
 import { Response, Request, NextFunction } from "express";
 import { JWTType, TokenType } from "../../interfaces/tokenType";
 import User from "../user/user";
-import AppleStrategy from "./strategy/appleStrategy";
-import AuthenticationContext from "./strategy/authenticationContext";
-import GoogleStrategy from "./strategy/googleStategy";
-import JWTStrategy from "./strategy/jwtStrategy";
+import AppleStrategy from "../user/strategy/appleStrategy";
+import AuthenticationContext from "../user/strategy/authenticationContext";
+import GoogleStrategy from "../user/strategy/googleStategy";
+import JWTStrategy from "../user/strategy/AuthStrategy";
 import * as jwt from "jsonwebtoken";
 import envs from '../../config';
 import { IUserService, UserService } from "../user/service";
@@ -31,13 +31,17 @@ export class AuthService implements IAuthService {
         }
 
         try {
-            const user = await authContext.validate(token);
+            const user = await this.validate(token);
             //@ts-ignore
             req.user = user;
             return next();
         } catch (error) {
             return res.status(400).json({ error });
         }
+    }
+
+    async validate(token: string) {
+
     }
 
     async createPairOfTokens(id: number) {
@@ -48,6 +52,10 @@ export class AuthService implements IAuthService {
             expiresIn: envs.refreshExpire,
         });
         return { accessToken, refreshToken }
+    }
+
+    async googleCallBack(data: any) {
+        console.log('data', data)
     }
 }
 

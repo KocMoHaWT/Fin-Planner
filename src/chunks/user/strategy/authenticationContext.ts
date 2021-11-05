@@ -1,6 +1,6 @@
 import { IAuthentication } from "../../../interfaces/authentication";
 import { JWTType } from "../../../interfaces/tokenType";
-import Account from "../../user/user";
+import Account from "../user";
 
 export default class AuthenticationContext {
     strategy: IAuthentication;
@@ -9,9 +9,12 @@ export default class AuthenticationContext {
     setStrategy(strategy: IAuthentication) {
         this.strategy = strategy;
     }
+    verifyByCredentials(email: string, password: string): Promise<Account | number> {
+        return this.strategy.verify(email, password);
+    }
 
-    validate(token: string): Promise<Account | number> {
-        return this.strategy.validate(token);
+    verifyByToken(token: string): Promise<Account | number> {
+        return this.strategy.verifyByToken(token);
     }
 
     createToken(id: number, type: JWTType) {

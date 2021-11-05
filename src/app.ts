@@ -14,6 +14,7 @@ const server = new Server(app, connection, 3001);
 const globalMiddleware: Array<RequestHandler> = [
     express.urlencoded({ extended: false }),
     express.json(),
+    express.static('public'),
     // cors({ credentials: true, origin: true }),
 ];
 

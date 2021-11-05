@@ -4,6 +4,7 @@ import InjectableContainer from "../../application/InjectableContainer";
 
 export interface IAuthController {
     kek: (req: Request, res: Response ) => Promise<any>
+    googleCallback: (req: Request, res: Response) => Promise<void | Response>
 }
 
 export class AuthController implements IAuthController {
@@ -15,6 +16,10 @@ export class AuthController implements IAuthController {
 
     async kek(req: Request, res: Response) {
         return {};
+    }
+
+    async googleCallback(req: Request, res: Response) {
+        this.service.googleCallBack(req, res);
     }
 }
 
