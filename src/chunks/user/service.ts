@@ -6,10 +6,10 @@ import envs from '../../config';
 import { TokenType } from "../../interfaces/tokenType";
 import { CustomRequest } from "../../interfaces/request";
 import InjectableContainer from "../../application/InjectableContainer";
-import AuthenticationContext from "./strategy/authenticationContext";
-import AuthStrategy from "./strategy/AuthStrategy";
-import GoogleStrategy from "./strategy/googleStategy";
-import AppleStrategy from "./strategy/appleStrategy";
+import AuthenticationContext from "../auth/strategy/authenticationContext";
+import AuthStrategy from "../auth/strategy/authStrategy";
+import GoogleStrategy from "../auth/strategy/googleStategy";
+import AppleStrategy from "../auth/strategy/appleStrategy";
 
 export interface IUserService {
     createUser: (req: Request, res: Response) => Promise<void | Response<any, Record<string, any>>>;
@@ -17,6 +17,7 @@ export interface IUserService {
     loginUser: (req: Request, res: Response) => Promise<Response>;
     getUser: (id: number) => Promise<User>;
     sendUserToFront: (req: CustomRequest, res: Response) => Promise<Response<IUser>>;
+    verifyUser: (email: string, password: string) => Promise<User>;
 }
 
 export class UserService {
@@ -42,44 +43,6 @@ export class UserService {
         });
     }
 
-    async loginUser(req: Request, res: Response) {
-        let authContext = new AuthenticationContext();
-        const tokenInBody = req.body?.token;
-        if ((!req.body.email || !req.body.password) && !tokenInBody) {
-            return res.status(409).end();
-        }
-
-        switch (tokenInBody) {
-            case TokenType.google:
-                authContext.setStrategy(new GoogleStrategy({ userService: this as IUserService}));
-                break;
-            case TokenType.apple:
-                authContext.setStrategy(new AppleStrategy());
-                break;
-            default:
-                authContext.setStrategy(new AuthStrategy({ repository: this.repository}));
-                break;
-        }
-        let user 
-        if (tokenInBody) {
-            user = await authContext.verifyByToken(tokenInBody);
-        } else {
-            user = await authContext.verifyByCredentials(req.body.email, req.body?.passowrd);
-        }
-        
-        if (!user) return res.status(409).end();
-        const accessToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
-            expiresIn: envs.accessExpire,
-        });
-        const refreshToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
-            expiresIn: envs.refreshExpire,
-        });
-        return res.status(200).json({
-            accessToken,
-            refreshToken,
-        });
-    }
-
     async updateUser(req: Request, res: Response): Promise<Response> {
         const result = await this.repository.update(req.body);
         return res.status(200).json(result);
@@ -93,6 +56,10 @@ export class UserService {
     async sendUserToFront(req: CustomRequest, res: Response) {
         if (!req?.user) return null;
         return res.status(200).json(req?.user.toJSON());
+    }
+
+    async verifyUser(email: string, password: string) {
+        return this.repository.verifyUser(email, password);
     }
 }
 

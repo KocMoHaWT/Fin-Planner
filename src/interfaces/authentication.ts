@@ -1,4 +1,4 @@
-import Account from "../chunks/user/user";
+import User from "../chunks/user/user";
 import { JWTType } from "./tokenType";
 
 type test = {
@@ -6,7 +6,7 @@ type test = {
 }
 
 export interface IAuthentication {
-    verify?: (email: string, password?: string) => Promise<Account | number>;
-    verifyByToken?: (token: string) => Promise<Account | number>;
+    verify?: (email: string, password?: string) => Promise<User>;
+    verifyByToken?: (token: string) => Promise<User>;
     createToken?: (id: number, type: JWTType) => Promise<string>;
 }
