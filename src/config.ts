@@ -14,4 +14,7 @@ export default {
   port: 5432,
   jwtSecret: process.env.jwtSecret,
   googleId: process.env.googleId,
+  redisHost: process.env.redisHost,
+  redisPassword: process.env.redisPass,
+  redisPort: process.env.redisPort,
 };

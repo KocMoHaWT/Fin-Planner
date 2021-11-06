@@ -5,6 +5,7 @@ class InjectableContainer {
 
 
     setDependency(dependency: any, key: string, arrayOfDependencies: string[]) {
+       
         this.instances[key] = {
             instance: dependency,
             args: arrayOfDependencies,
@@ -21,12 +22,13 @@ class InjectableContainer {
                 params[arg] = this.initDependency(arg)
             }
         })
-        const isFunction = entity.args.length === 0 && typeof this.instances[el].instance === 'function';
-        if (isFunction) {
+        const isClass = /^\s*class\s+/.test(this.instances[el].instance.toString());
+        if (!isClass) {
             this.dependencies[el] = this.instances[el].instance;
             return this.dependencies[el];
         }
-        this.dependencies[el] = new this.instances[el].instance(entity.args.length ? { ...params } : undefined)
+    
+        this.dependencies[el] = new this.instances[el].instance(entity.args.length ? { ...params } : undefined);
         return this.dependencies[el];
     }
 

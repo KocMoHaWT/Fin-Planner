@@ -10,15 +10,21 @@ import envs from '../../config';
 import { IUserService, UserService } from "../user/service";
 import InjectableContainer from "../../application/InjectableContainer";
 import AuthStrategy from "./strategies/authStrategy";
+import { IRedisRepository } from "./datasource/redis";
 
 export interface IAuthService {
-    middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>
+    middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
+    googleCallBack: (req: Request, res: Response) => Promise<void | Response>;
+    kek: () => void;
 }
 
 export class AuthService implements IAuthService {
     private userService: IUserService;
-    constructor({ userService }: { userService: IUserService }) {
+    private redisRepository: IRedisRepository;
+    constructor({ userService, redisRepository }: { userService: IUserService, redisRepository: IRedisRepository }) {
         this.userService = userService;
+        this.redisRepository = redisRepository;
+        this.redisRepository.kwa();
     }
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
@@ -55,16 +61,16 @@ export class AuthService implements IAuthService {
                 authContext.setStrategy(new AppleStrategy());
                 break;
             default:
-                authContext.setStrategy(new AuthStrategy({ userService: this.userService}));
+                authContext.setStrategy(new AuthStrategy({ userService: this.userService }));
                 break;
         }
-        let user 
+        let user
         if (tokenInBody) {
             user = await authContext.verifyByToken(tokenInBody);
         } else {
             user = await authContext.verifyByCredentials(req.body.email, req.body?.passowrd);
         }
-        
+
         if (!user) return res.status(409).end();
         const accessToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
             expiresIn: envs.accessExpire,
@@ -79,7 +85,7 @@ export class AuthService implements IAuthService {
     }
 
     async validate(token: string) {
-        
+
     }
 
 
@@ -96,10 +102,14 @@ export class AuthService implements IAuthService {
     async googleCallBack(data: any) {
         console.log('data', data)
     }
+
+    async kek() {
+        this.redisRepository.kwa();
+    }
 }
 
 const init = new Promise(() => {
-    InjectableContainer.setDependency(AuthService, 'authService', ['userService']);
+    InjectableContainer.setDependency(AuthService, 'authService', ['userService', 'redisRepository']);
 });
 
 export default init;
