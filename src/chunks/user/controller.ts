@@ -4,7 +4,6 @@ import { CustomRequest } from "../../interfaces/request";
 import InjectableContainer from "../../application/InjectableContainer";
 
 export interface IUserController {
-    register: (req: Request, res: Response) => Promise<any>;
     update: (req: Request, res: Response) => Promise<any>;
     read: (req: Request, res: Response) => Promise<any>;
     login: (req: Request, res: Response) => Promise<any>;
@@ -19,17 +18,6 @@ export class UserController implements IUserController {
 
     async login(req: Request, res: Response) {
         return this.service.loginUser(req, res);
-    }
-
-    async register(req: Request, res: Response) {
-        const user = this.service.createUser(req, res);
-        if (!user) {
-            return '';
-        }
-        //create tokens
-        const accessToken = '';
-        const refreshToken = '';
-        return { accessToken, refreshToken};
     }
 
     async read(req: CustomRequest, res: Response) {

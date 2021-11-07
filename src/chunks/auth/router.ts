@@ -19,6 +19,8 @@ export class AuthRouter extends CommonRoutesConfig {
 
     configureRoutes() {
         this.router.get('/', [this.controller.kek.bind(this.controller)])
+        this.router.post('/register', [this.controller.register.bind(this.controller)]);
+        this.router.post('/login', [this.controller.login.bind(this.controller)]);
         return this.router;
     }
 }

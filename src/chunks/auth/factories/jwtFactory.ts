@@ -2,7 +2,7 @@ import * as jwt from 'jsonwebtoken'
 import envs from '../../../config';
 
 class JWTFactory {
-    async createTokenPair(id: number) {
+    async createTokenPair(id: number): Promise<{ accessToken: string, refreshToken: string }>   {
         const accessToken = await jwt.sign({ id }, envs.jwtSecret, {
             expiresIn: envs.accessExpire,
         });

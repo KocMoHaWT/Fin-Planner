@@ -2,21 +2,18 @@ import { Response, Request } from "express";
 import User, { IUser } from "./user";
 import UserRepository, { IUserRepository } from "./repository";
 
-import { TokenType } from "../../interfaces/tokenType";
 import { CustomRequest } from "../../interfaces/request";
 import InjectableContainer from "../../application/InjectableContainer";
-import AuthenticationContext from "../auth/strategies/authenticationContext";
-import AuthStrategy from "../auth/strategies/authStrategy";
-import GoogleStrategy from "../auth/strategies/googleStategy";
-import AppleStrategy from "../auth/strategies/appleStrategy";
+import AuthData from "../auth/valueObjects/authenticationData";
 
 export interface IUserService {
-    createUser: (req: Request, res: Response) => Promise<void | Response<any, Record<string, any>>>;
+    create: (body: AuthData) => Promise<User>;
     updateUser: (req: Request, res: Response) => Promise<Response>;
     loginUser: (req: Request, res: Response) => Promise<Response>;
     getUser: (id: number) => Promise<User>;
     sendUserToFront: (req: CustomRequest, res: Response) => Promise<Response<IUser>>;
     verifyUser: (email: string, password: string) => Promise<User>;
+    isUserExists: (email: string) => Promise<boolean>;
 }
 
 export class UserService {
@@ -25,18 +22,9 @@ export class UserService {
         this.repository = userRepository;
     }
 
-    async createUser(req: Request, res: Response) {
-        const isExists = await this.repository.isUserExists(req.body.email);
-        if (!isExists) return res.status(409).end();
+    async create(req: Request, res: Response) {
         await this.repository.create(req.body);
-        const user = await this.repository.findByEmail(req.body.email);
-        // const accessToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
-        //     expiresIn: envs.accessExpire,
-        // });
-        // const refreshToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
-        //     expiresIn: envs.refreshExpire,
-        // });
-        return user;
+        return  await this.repository.findByEmail(req.body.email);
     }
 
     async updateUser(req: Request, res: Response): Promise<Response> {
@@ -56,6 +44,10 @@ export class UserService {
 
     async verifyUser(email: string, password: string) {
         return this.repository.verifyUser(email, password);
+    }
+
+    async isUserExists(email: string) {
+        return this.repository.isUserExists(email);
     }
 }
 

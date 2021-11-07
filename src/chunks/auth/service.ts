@@ -11,10 +11,13 @@ import { IUserService, UserService } from "../user/service";
 import InjectableContainer from "../../application/InjectableContainer";
 import AuthStrategy from "./strategies/authStrategy";
 import { IRedisRepository } from "./datasource/redis";
+import jwtFactory from "./factories/jwtFactory";
 
 export interface IAuthService {
     middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
     googleCallBack: (req: Request, res: Response) => Promise<void | Response>;
+    registerUser: (req: Request, res: Response) => Promise<void | Response>;
+    loginUser: (req: Request, res: Response) => Promise<void | Response>;
 }
 
 export class AuthService implements IAuthService {
@@ -26,7 +29,6 @@ export class AuthService implements IAuthService {
     }
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
-        // const type = req.body.type;
         const authHeader = req.headers["authorization"];
         const token = authHeader && authHeader.split(" ")[1];
 
@@ -35,7 +37,8 @@ export class AuthService implements IAuthService {
         }
 
         try {
-            const user = await this.validate(token);
+            const userId = await this.validate(token);
+            const user = await this.userService.getUser(+userId);
             //@ts-ignore
             req.user = user;
             return next();
@@ -44,7 +47,7 @@ export class AuthService implements IAuthService {
         }
     }
 
-    async loginUser(req: Request, res: Response) {
+    async loginUser(req: Request, res: Response): Promise<void | Response> {
         let authContext = new AuthenticationContext();
         const tokenInBody = req.body?.token;
         if ((!req.body.email || !req.body.password) && !tokenInBody) {
@@ -70,22 +73,37 @@ export class AuthService implements IAuthService {
         }
 
         if (!user) return res.status(409).end();
-        const accessToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
-            expiresIn: envs.accessExpire,
-        });
-        const refreshToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
-            expiresIn: envs.refreshExpire,
-        });
-        this.redisRepository.set(accessToken, user.id);
- 
+        const tokens = await jwtFactory.createTokenPair(user.id);
+        this.redisRepository.set(tokens.accessToken, user.id);
         return res.status(200).json({
-            accessToken,
-            refreshToken,
+            ...tokens
         });
     }
 
     async validate(token: string) {
+        const isValid = jwtFactory.validate(token);
+        if (!isValid) {
+            throw Error('is not valid');
+        }
+        const id = await this.redisRepository.get(token);
 
+        if (!id) {
+            throw Error('is not in session');
+        }
+
+        return id;
+    }
+
+    async registerUser(req: Request, res: Response): Promise<void | Response> {
+        const isExists = await this.userService.isUserExists(req.body.email);
+        if (!isExists) return res.status(409).end();
+
+        const user = await this.userService.create(req.body);
+        if (!user) {
+            throw new Error('error in register');
+        }
+        const tokens = await jwtFactory.createTokenPair(user.id);
+        return res.status(200).json({ ...tokens });
     }
 
 
