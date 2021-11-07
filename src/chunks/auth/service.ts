@@ -15,7 +15,6 @@ import { IRedisRepository } from "./datasource/redis";
 export interface IAuthService {
     middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
     googleCallBack: (req: Request, res: Response) => Promise<void | Response>;
-    kek: () => void;
 }
 
 export class AuthService implements IAuthService {
@@ -24,7 +23,6 @@ export class AuthService implements IAuthService {
     constructor({ userService, redisRepository }: { userService: IUserService, redisRepository: IRedisRepository }) {
         this.userService = userService;
         this.redisRepository = redisRepository;
-        this.redisRepository.kwa();
     }
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
@@ -78,6 +76,8 @@ export class AuthService implements IAuthService {
         const refreshToken = await jwt.sign({ id: user.id }, envs.jwtSecret, {
             expiresIn: envs.refreshExpire,
         });
+        this.redisRepository.set(accessToken, user.id);
+ 
         return res.status(200).json({
             accessToken,
             refreshToken,
@@ -102,14 +102,10 @@ export class AuthService implements IAuthService {
     async googleCallBack(data: any) {
         console.log('data', data)
     }
-
-    async kek() {
-        this.redisRepository.kwa();
-    }
 }
 
 const init = new Promise(() => {
-    InjectableContainer.setDependency(AuthService, 'authService', ['userService', 'redisRepository']);
+    InjectableContainer.setDependency(AuthService, 'authService', ['userService', 'redisRepository', 'authRepository']);
 });
 
 export default init;

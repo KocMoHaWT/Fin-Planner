@@ -3,7 +3,8 @@ import InjectableContainer from '../../../application/InjectableContainer';
 import envs from '../../../config';
 
 export interface IRedisRepository {
-    kwa: () => void;
+    set: (key: string, value: string | number) => Promise<void>;
+    get: (key: string) => Promise<string | number>;
 }
 
 class RedisRepository implements IRedisRepository {
@@ -18,9 +19,12 @@ class RedisRepository implements IRedisRepository {
         this.client.set('framework', 'ReactJS');
     }
 
-    async kwa() {
-        const value = await this.client.get('framework');
-        console.log('===>>>',value);
+    async set(key: string, value: string) {
+        return this.client.set(key, value);
+    }
+
+    async get(key: string) {
+        return this.client.get(key)
     }
 }
 

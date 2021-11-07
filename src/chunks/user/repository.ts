@@ -95,32 +95,6 @@ export class UserRepository implements IUserRepository {
         }
         return null;
     }
-
-    saveRefreshToken = async (
-        refreshToken: string,
-        id: string
-    ): Promise<void> => {
-        await getManager().query(
-            `
-          UPDATE users 
-          SET refreshToken = $1
-          WHERE id = $2
-        `,
-            [refreshToken, id]
-        );
-    };
-    // swith to auth repo
-    async addIdentity(id: number, identity: string, type: Identity): Promise<void> {
-        this.manager().query(
-            `
-        UPDATE users-auth
-        SET ${TokenByType[type]}=$1
-        WHERE user=$2
-    `,
-            [identity, id]
-        )
-        return null;
-    }
 }
 
 const init = new Promise(() => {
