@@ -8,11 +8,12 @@ export interface IAuthRepository {
     saveRefreshToken: (refreshToken: string, id: number) => Promise<void>;
     addIdentity: (id: number, identity: string, type: Identity) => Promise<void>;
     getUserByIdentity: (identity: string, type: Identity) => Promise<User | null>;
+    create: (userId: number) => Promise<void>;
 }
 
 const TokenByType = {
-    'googleToken': 'googleIdentity',
-    'appleToken': 'appleIdentity'
+    'googleToken': 'gogle',
+    'appleToken': 'apple'
 }
 type Identity = TokenType.apple | TokenType.google;
 
@@ -29,18 +30,28 @@ export class AuthRepository implements IAuthRepository {
     ): Promise<void> => {
         await getManager().query(
             `
-          UPDATE users 
+          UPDATE usersauth 
           SET refreshToken = $1
-          WHERE id = $2
+          WHERE user_id = $2
         `,
             [refreshToken, id]
         );
     };
 
+    async create(userId: number) {
+        return await this.manager().query(
+            `
+        INSERT INTO usersauth (user_id)
+        VALUES ($1);
+    `,
+            [userId]
+        )
+    }
+
     async addIdentity(id: number, identity: string, type: Identity): Promise<void> {
         this.manager().query(
             `
-        UPDATE users-auth
+        UPDATE usersauth
         SET ${TokenByType[type]}=$1
         WHERE user=$2
     `,
@@ -54,10 +65,10 @@ export class AuthRepository implements IAuthRepository {
     async getUserByIdentity(identity: string, type: Identity): Promise<User | null> {
         this.manager().query(`
             SELECT users.email, users.name, users.id, users.defaultCurrency 
-            FROM users-auth
+            FROM usersauth
             WHERE ${TokenByType[type]} = $1;
             RIGHT JOIN users
-            ON users-auth.userId = users.id;
+            ON usersauth.userId = users.id;
         `, [identity])
         return null;
     }

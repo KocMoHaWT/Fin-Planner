@@ -22,9 +22,10 @@ export class UserService {
         this.repository = userRepository;
     }
 
-    async create(req: Request, res: Response) {
-        await this.repository.create(req.body);
-        return  await this.repository.findByEmail(req.body.email);
+    async create(body: AuthData) {
+        console.log('body',body);
+        await this.repository.create(body);
+        return  await this.repository.findByEmail(body.email);
     }
 
     async updateUser(req: Request, res: Response): Promise<Response> {

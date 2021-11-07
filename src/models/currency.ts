@@ -11,7 +11,7 @@ import {
     ManyToOne,
     OneToMany,
   } from "typeorm";
-import { UserAuth } from "./users-auth";
+import { UserAuth } from "./usersAuth";
   
   @Entity("currencies")
   export class Currency {

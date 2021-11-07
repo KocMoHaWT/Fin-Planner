@@ -13,7 +13,7 @@ import {
   } from "typeorm";
 import { Bucket } from "./bucket";
 import { Currency } from "./currency";
-import { UserAuth } from "./users-auth";
+import { UserAuth } from "./usersAuth";
   
   @Entity("users")
   export class User {

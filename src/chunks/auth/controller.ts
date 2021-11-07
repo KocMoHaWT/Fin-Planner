@@ -24,6 +24,7 @@ export class AuthController implements IAuthController {
     }
 
     async register(req: Request, res: Response) {
+        console.log('qwe');
         const tokens = this.service.registerUser(req, res);
         return res.json({...tokens});
     }

@@ -14,7 +14,7 @@ import {
 import { BucketType } from "./bucketType";
 import { Currency } from "./currency";
 import { User } from "./user";
-import { UserAuth } from "./users-auth";
+import { UserAuth } from "./usersAuth";
   
   @Entity("buckets")
   export class Bucket {
