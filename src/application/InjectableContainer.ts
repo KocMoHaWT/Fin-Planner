@@ -27,8 +27,10 @@ class InjectableContainer {
             this.dependencies[el] = this.instances[el].instance;
             return this.dependencies[el];
         }
-    
-        this.dependencies[el] = new this.instances[el].instance(entity.args.length ? { ...params } : undefined);
+        // needs in order to not create instance a lot of times because of recursion
+        if (!this.dependencies[el]) {
+            this.dependencies[el] = new this.instances[el].instance(entity.args.length ? { ...params } : undefined);
+        }
         return this.dependencies[el];
     }
 

@@ -15,7 +15,6 @@ export class AuthController implements IAuthController {
     }
 
     async kek(req: Request, res: Response) {
-        this.service.kek();
     }
 
     async googleCallback(req: Request, res: Response) {
