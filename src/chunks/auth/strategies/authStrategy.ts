@@ -12,7 +12,8 @@ export default class AuthStrategy implements IAuthentication {
     constructor({ userService }: { userService: IUserService}) {
         this.userService = userService;
     }
-    async verify(email: string, password: string): Promise<User> {
-        return await this.userService.verifyUser(email, password);
+    async verify(token: string): Promise<User> {
+        const payload: any = await jwt.verify(token, envs.secretKey)
+        return this.userService.getUser(payload.id as any);
     }
 }

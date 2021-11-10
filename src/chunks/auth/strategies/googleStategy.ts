@@ -4,13 +4,16 @@ import { testAcc } from "../../../utils/testAcc";
 import User from "../../user/user";
 import envs from '../../../config';
 import { IUserService } from "../../user/service";
+import { IAuthService } from "../service";
+import AuthenticationData from "../valueObjects/authenticationData";
 
 
 export default class GoogleStrategy implements IAuthentication {
+    private authService: IAuthService;
     private userService: IUserService;
     client: any;
-    constructor({ userService }: { userService: IUserService }) {
-        this.userService = userService;
+    constructor({ authService }: { authService: IAuthService, userService: IUserService }) {
+        this.authService = authService
         this.client = new OAuth2Client(envs.googleId)
     }
     async verify(token: string): Promise<User> {
@@ -20,11 +23,22 @@ export default class GoogleStrategy implements IAuthentication {
                 audience: envs.googleId,  // Specify the CLIENT_ID of the app that accesses the backend
             });
             const payload = ticket.getPayload();
-            console.log('payload',payload);
+            console.log('google payload', payload);
+            // check if exists 
+            // if yes return user
+            // if not save anad return user
+            const user = await this.authService.getUserByGoogleId(payload['sub']);
 
+            if (!user) {
+                const authUser = new AuthenticationData({ email: payload?.email, name: payload?.name })
+                // todo develop transaction here or another save way to update both table
+                const newUser = await this.userService.create(authUser);
+                await this.authService.create(newUser.id);
+                return newUser;
+            }
+            return user;
         } catch {
             throw new Error('we fucked');
         }
-        return Promise.resolve(new User(testAcc));
     }
 }

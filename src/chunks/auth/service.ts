@@ -13,12 +13,15 @@ import AuthStrategy from "./strategies/authStrategy";
 import { IRedisRepository } from "./datasource/redis";
 import jwtFactory from "./factories/jwtFactory";
 import { IAuthRepository } from "./repository";
+import AuthenticationData from "./valueObjects/authenticationData";
 
 export interface IAuthService {
     middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
     googleCallBack: (req: Request, res: Response) => Promise<void | Response>;
     registerUser: (req: Request, res: Response) => Promise<void | Response>;
     loginUser: (req: Request, res: Response) => Promise<void | Response>;
+    getUserByGoogleId: (token: string) => Promise<User>;
+    create: (userId: number) => Promise<void>
 }
 
 export class AuthService implements IAuthService {
@@ -31,7 +34,7 @@ export class AuthService implements IAuthService {
         this.repository = authRepository;
     }
 
-    async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
+    async middleware1(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
         const authHeader = req.headers["authorization"];
         const token = authHeader && authHeader.split(" ")[1];
 
@@ -40,8 +43,65 @@ export class AuthService implements IAuthService {
         }
 
         try {
-            const userId = await this.validate(token);
-            const user = await this.userService.getUser(+userId);
+            // const userId = await this.validate(token);
+            // const user = await this.userService.getUser(+userId);
+            //@ts-ignore
+            // req.user = user;
+            return next();
+        } catch (error) {
+            return res.status(400).json({ error });
+        }
+    }
+
+    async loginUser(req: Request, res: Response): Promise<void | Response> {
+        try {
+            const user = await this.userService.verifyUser(req.body.email, req.body.password);
+            if (!user) {
+                res.status(400).end();
+            }
+            const tokens = await jwtFactory.createTokenPair(user.id);
+            this.redisRepository.set(tokens.accessToken, user.id);
+            this.repository.saveRefreshToken(tokens.refreshToken, user.id);
+            return res.status(200).json({
+                ...tokens
+            });
+        } catch (error) {
+            return res.status(400).json({ error });
+        }
+    }
+
+    async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
+        let authContext = new AuthenticationContext();
+        const authHeader = req.headers["authorization"];
+        const tokenInHeader = authHeader && authHeader.split(" ")[1];
+        let token;
+        let type;
+        if (authHeader && tokenInHeader) {
+            token = tokenInHeader;
+            type = TokenType.jwt
+        } else {
+            token = req.cookies.googleToken || req.cookies.appleToken;
+            type = TokenType.google || TokenType.apple
+        }
+        if (!type || !token) {
+            return res.status(409).end();
+        }
+        try {
+            switch (type) {
+                case TokenType.google:
+                    authContext.setStrategy(new GoogleStrategy({ authService: this as IAuthService, userService: this.userService }));
+                    break;
+                case TokenType.apple:
+                    authContext.setStrategy(new AppleStrategy());
+                    break;
+                default:
+                    authContext.setStrategy(new AuthStrategy({ userService: this.userService }));
+                    break;
+            }
+
+            const user = await authContext.verify(req.body.token);
+
+            if (!user) return res.status(409).end();
             //@ts-ignore
             req.user = user;
             return next();
@@ -50,42 +110,12 @@ export class AuthService implements IAuthService {
         }
     }
 
-    async loginUser(req: Request, res: Response): Promise<void | Response> {
-        let authContext = new AuthenticationContext();
-        const tokenType = req.body?.type;
-        if ((!req.body.email || !req.body.password) && !tokenType) {
-            return res.status(409).end();
-        }
-
-        switch (tokenType) {
-            case TokenType.google:
-                authContext.setStrategy(new GoogleStrategy({ userService: this.userService }));
-                break;
-            case TokenType.apple:
-                authContext.setStrategy(new AppleStrategy());
-                break;
-            default:
-                authContext.setStrategy(new AuthStrategy({ userService: this.userService }));
-                break;
-        }
-        let user
-        if (tokenType) {
-            user = await authContext.verifyByToken(req.body.token);
-        } else {
-            user = await authContext.verifyByCredentials(req.body.email, req.body?.password);
-        }
-
-        if (!user) return res.status(409).end();
-        const tokens = await jwtFactory.createTokenPair(user.id);
-        this.redisRepository.set(tokens.accessToken, user.id);
-        this.repository.saveRefreshToken(tokens.refreshToken, user.id);
-        return res.status(200).json({
-            ...tokens
-        });
-    }
-
     async create(userId: number) {
         await this.repository.create(userId);
+    }
+
+    async getUserByGoogleId(id: string) {
+        return this.repository.getUserByIdentity(id, TokenType.google)
     }
 
     async validate(token: string) {
@@ -105,19 +135,18 @@ export class AuthService implements IAuthService {
     async registerUser(req: Request, res: Response): Promise<void | Response> {
         try {
             const isExists = await this.userService.isUserExists(req.body.email);
-            // if (isExists) return res.status(409).end();
-            // const user = await this.userService.create(req.body);
-            // const user =  await this.userService.getUser(1);
-            // await this.create(user.id);
-            console.log('oh here')
-            // if (!user) {
-            //     throw new Error('error in register');
-            // }
-            const tokens = await jwtFactory.createTokenPair(1);
-            this.repository.saveRefreshToken(tokens.refreshToken, 1);
-            return res.status(200).json({ ...tokens });
+            const authUser = new AuthenticationData({ email: req.body.email, name: req.body.name, password: req.body.password })
+            if (isExists) return res.status(409).end();
+            const user = await this.userService.create(authUser);
+            await this.create(user.id);
+            if (!user) {
+                throw new Error('error in save');
+            }
+            const tokens = await jwtFactory.createTokenPair(user.id);
+            this.repository.saveRefreshToken(tokens.refreshToken, user.id);
+            return res.status(200).json({});
         } catch (error) {
-
+            return res.status(409).end();
         }
     }
 

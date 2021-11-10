@@ -27,7 +27,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async create(user: AuthData): Promise<void> {
-        await this.manager().query(
+        return await this.manager().query(
             `
         INSERT INTO users (name, email, password)
         VALUES ($1, $2, $3);

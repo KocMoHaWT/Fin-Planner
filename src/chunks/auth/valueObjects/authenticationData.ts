@@ -1,10 +1,9 @@
 import { emailRegExp, passwordRegExp } from "../../../utils/regexp";
 
 interface IAuthData {
-    email: string;
-    password: string;
-    firstName?: string;
-    lastName?: string;
+    email?: string;
+    password?: string;
+    name?: string;
 }
 
 export default class AuthenticationData {
@@ -12,13 +11,14 @@ export default class AuthenticationData {
     public password;
     public name;
 
-    constructor({ email, password, firstName, lastName }: IAuthData) {
+    constructor({ email, password, name }: IAuthData) {
         if (!this.validateEmail(email) || !this.validatePassword(password)) {
+            console.log('new ');
             throw new Error('not valid');
         }
         this.email = email;
         this.password = password;
-        this.name = firstName;
+        this.name = name;
     }
 
     validateEmail(email: string) {
@@ -26,7 +26,8 @@ export default class AuthenticationData {
     }
 
     validatePassword(password: string) {
-        return passwordRegExp.test(password);
+        // return passwordRegExp.test(password);
+        return true;
     }
 
     toJSON() {

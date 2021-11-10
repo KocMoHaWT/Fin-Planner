@@ -5,7 +5,6 @@ class InjectableContainer {
 
 
     setDependency(dependency: any, key: string, arrayOfDependencies: string[]) {
-       
         this.instances[key] = {
             instance: dependency,
             args: arrayOfDependencies,

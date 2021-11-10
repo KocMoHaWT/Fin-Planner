@@ -23,7 +23,6 @@ export class UserService {
     }
 
     async create(body: AuthData) {
-        console.log('body',body);
         await this.repository.create(body);
         return  await this.repository.findByEmail(body.email);
     }

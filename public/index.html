@@ -33,16 +33,22 @@
         console.log(id_token);
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/login');
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = function() {
-            console.log('Signed in as: ' + xhr.responseText);
-            if(xhr.responseText == 'success'){
-                signOut();
-                location.assign('/profile')
-            }
-        };
-        xhr.send(JSON.stringify({token : id_token}));
+        document.cookie = 'test=test';
+        fetch('/users/8/', {
+            method: 'GET',
+            credentials: 'same-origin',
+        })
+        // xhr.open('GET', '/users/8/');
+        // xhr.setRequestHeader('Content-Type', 'application/json');
+        // xhr.setRequestHeader('Set-Cookie', 'qwe=qwe')
+        // xhr.onload = function() {
+        //     console.log('Signed in as: ' + xhr.responseText);
+        //     if(xhr.responseText == 'success'){
+        //         signOut();
+        //         location.assign('/profile')
+        //     }
+        // };
+        // xhr.send();
       }
     </script>
     
