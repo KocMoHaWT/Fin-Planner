@@ -11,7 +11,6 @@ export default class AuthenticationContext {
     }
 
     verify(token: string): Promise<User> {
-        console.log('context', token);
         return this.strategy.verify(token);
     }
 }

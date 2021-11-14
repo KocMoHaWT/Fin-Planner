@@ -7,6 +7,7 @@ export interface IAuthController {
     googleCallback: (req: Request, res: Response) => Promise<void | Response>;
     register: (req: Request, res: Response) => Promise<any>;
     login: (req: Request, res: Response) => Promise<any>;
+    logout: (req: Request, res: Response) => Promise<any>;
 }
 
 export class AuthController implements IAuthController {
@@ -30,6 +31,10 @@ export class AuthController implements IAuthController {
 
     async login(req: Request, res: Response) {
         return this.service.loginUser(req, res);
+    }
+
+    async logout(req: Request, res: Response) {
+        return this.service.logout(req, res);
     }
 }
 

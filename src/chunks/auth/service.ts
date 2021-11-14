@@ -14,12 +14,14 @@ import { IRedisRepository } from "./datasource/redis";
 import jwtFactory from "./factories/jwtFactory";
 import { IAuthRepository } from "./repository";
 import AuthenticationData from "./valueObjects/authenticationData";
+import { CustomRequest } from "../../interfaces/request";
 
 export interface IAuthService {
     middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
     googleCallBack: (req: Request, res: Response) => Promise<void | Response>;
     registerUser: (req: Request, res: Response) => Promise<void | Response>;
     loginUser: (req: Request, res: Response) => Promise<void | Response>;
+    logout: (req: Request, res: Response) => Promise<void | Response>;
     getUserByGoogleId: (token: string) => Promise<User>;
     create: (userId: number) => Promise<void>
     refreshToken: (req: Request, res: Response) => Promise<void | Response>;
@@ -154,6 +156,17 @@ export class AuthService implements IAuthService {
 
     async googleCallBack(data: any) {
         console.log('data', data)
+    }
+
+    async logout(req: CustomRequest, res: Response) {
+        if (!req.user) return res.status(400).end();
+        const authHeader = req.headers["authorization"];
+        if (authHeader) {
+            return this.repository.saveRefreshToken(null, req.user.id);
+        }
+
+        res.clearCookie('googleToken');
+        return res.status(200);
     }
 }
 
