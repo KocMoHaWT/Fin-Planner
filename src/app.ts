@@ -31,7 +31,3 @@ Promise.resolve()
         server.loadRoutes(routers)
         server.run();
     });
-
-function cors(arg0: { credentials: boolean; origin: boolean; }): express.RequestHandler<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> {
-    throw new Error('Function not implemented.');
-}

@@ -26,7 +26,7 @@ import { UserAuth } from "./usersAuth";
     @Column({ type: "varchar", length: 200, nullable: false })
     email: string;
   
-    @Column({ type: "varchar", nullable: false })
+    @Column({ type: "varchar",  nullable: true  })
     password: string;
   
     @CreateDateColumn()

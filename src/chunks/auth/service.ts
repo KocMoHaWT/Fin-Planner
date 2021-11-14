@@ -22,6 +22,7 @@ export interface IAuthService {
     loginUser: (req: Request, res: Response) => Promise<void | Response>;
     getUserByGoogleId: (token: string) => Promise<User>;
     create: (userId: number) => Promise<void>
+    refreshToken: (req: Request, res: Response) => Promise<void | Response>;
 }
 
 export class AuthService implements IAuthService {
@@ -34,20 +35,18 @@ export class AuthService implements IAuthService {
         this.repository = authRepository;
     }
 
-    async middleware1(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
-        const authHeader = req.headers["authorization"];
-        const token = authHeader && authHeader.split(" ")[1];
+    async refreshToken(req: Request, res: Response): Promise<void | Response> {
+        const token = req.body?.token;
 
         if (!token) {
             return res.status(401).end();
         }
 
         try {
-            // const userId = await this.validate(token);
-            // const user = await this.userService.getUser(+userId);
-            //@ts-ignore
-            // req.user = user;
-            return next();
+            const userId = await this.repository.getUserAuthByRefreshToken(token);
+            if (!userId) return res.status(401).end('error no userId');
+            const tokens = await jwtFactory.createTokenPair(+userId);
+            res.status(200).json(tokens);
         } catch (error) {
             return res.status(400).json({ error });
         }
@@ -60,9 +59,9 @@ export class AuthService implements IAuthService {
                 res.status(400).end();
             }
             const tokens = await jwtFactory.createTokenPair(user.id);
-            this.redisRepository.set(tokens.accessToken, user.id);
-            this.repository.saveRefreshToken(tokens.refreshToken, user.id);
-            return res.status(200).json({
+            await this.repository.saveRefreshToken(tokens.refreshToken, user.id);
+            console.log('wa');
+            return res.status(201).json({
                 ...tokens
             });
         } catch (error) {
@@ -73,15 +72,18 @@ export class AuthService implements IAuthService {
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
         let authContext = new AuthenticationContext();
         const authHeader = req.headers["authorization"];
+        console.log(authHeader);
         const tokenInHeader = authHeader && authHeader.split(" ")[1];
+        console.log('tokenINheader', tokenInHeader);
         let token;
         let type;
         if (authHeader && tokenInHeader) {
             token = tokenInHeader;
             type = TokenType.jwt
-        } else {
-            token = req.cookies.googleToken || req.cookies.appleToken;
-            type = TokenType.google || TokenType.apple
+        } 
+        if (!authHeader && (req.cookies.googleToken || req.cookies.appleToken)){
+            token = req.cookies.googleToken ? req.cookies.googleToken : req.cookies.appleToken;
+            type = req.cookies.googleToken ? TokenType.google : TokenType.apple
         }
         if (!type || !token) {
             return res.status(409).end();
@@ -98,8 +100,8 @@ export class AuthService implements IAuthService {
                     authContext.setStrategy(new AuthStrategy({ userService: this.userService }));
                     break;
             }
-
-            const user = await authContext.verify(req.body.token);
+            const user = await authContext.verify(token);
+            console.log('user', user);
 
             if (!user) return res.status(409).end();
             //@ts-ignore
@@ -144,7 +146,7 @@ export class AuthService implements IAuthService {
             }
             const tokens = await jwtFactory.createTokenPair(user.id);
             this.repository.saveRefreshToken(tokens.refreshToken, user.id);
-            return res.status(200).json({});
+            return res.status(200).json({ ...tokens });
         } catch (error) {
             return res.status(409).end();
         }

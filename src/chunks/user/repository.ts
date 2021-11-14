@@ -52,19 +52,22 @@ export class UserRepository implements IUserRepository {
     async findByEmail(email: string): Promise<{ id: number }> {
         const res = await this.manager().query(
             `
-       SELECT id FROM users
+       SELECT id, name, email FROM users
         WHERE email = $1;
     `,
             [email]
         )
-        return res.pop();
+        if (res.length) {
+            return new User(res[0]);
+        }
+        return null;
     }
 
     async update(user: User): Promise<void> {
         const simpleUser = user.toJSON();
         const res = await this.manager().query(
             `
-        UPDATED users
+        UPDATE users
         SET name=$1, defaultCurrency=$2
         WHERE id=$1
     `,

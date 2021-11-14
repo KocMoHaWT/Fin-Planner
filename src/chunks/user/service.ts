@@ -14,6 +14,7 @@ export interface IUserService {
     sendUserToFront: (req: CustomRequest, res: Response) => Promise<Response<IUser>>;
     verifyUser: (email: string, password: string) => Promise<User>;
     isUserExists: (email: string) => Promise<boolean>;
+    isCurrentUserAcceptableForData: (req: CustomRequest, res: Response) => Promise<null>;
 }
 
 export class UserService {
@@ -24,7 +25,12 @@ export class UserService {
 
     async create(body: AuthData) {
         await this.repository.create(body);
-        return  await this.repository.findByEmail(body.email);
+        const user = await this.repository.findByEmail(body.email);
+        return user;
+    }
+
+    async isCurrentUserAcceptableForData(req: CustomRequest, res: Response) {
+        
     }
 
     async updateUser(req: Request, res: Response): Promise<Response> {

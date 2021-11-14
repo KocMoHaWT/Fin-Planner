@@ -3,7 +3,7 @@ import { Response, Request } from "express";
 import InjectableContainer from "../../application/InjectableContainer";
 
 export interface IAuthController {
-    kek: (req: Request, res: Response ) => Promise<any>;
+    refreshToken: (req: Request, res: Response ) => Promise<any>;
     googleCallback: (req: Request, res: Response) => Promise<void | Response>;
     register: (req: Request, res: Response) => Promise<any>;
     login: (req: Request, res: Response) => Promise<any>;
@@ -16,7 +16,8 @@ export class AuthController implements IAuthController {
         this.service = authService;
     }
 
-    async kek(req: Request, res: Response) {
+    async refreshToken(req: Request, res: Response) {
+        return this.service.refreshToken(req, res);
     }
 
     async googleCallback(req: Request, res: Response) {
@@ -24,13 +25,11 @@ export class AuthController implements IAuthController {
     }
 
     async register(req: Request, res: Response) {
-        const tokens = this.service.registerUser(req, res);
-        return res.json({...tokens});
+        return this.service.registerUser(req, res);
     }
 
     async login(req: Request, res: Response) {
-        const tokens = this.service.loginUser(req, res);
-        return res.json({...tokens});
+        return this.service.loginUser(req, res);
     }
 }
 

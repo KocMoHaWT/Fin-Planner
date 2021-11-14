@@ -33,6 +33,6 @@ export default class Server {
     };
 
     public async initDatabase(): Promise<void> {
-       return this.connection;
+        return this.connection;
     }
 }

@@ -9,10 +9,11 @@ export interface IAuthRepository {
     addIdentity: (id: number, identity: string, type: Identity) => Promise<void>;
     getUserByIdentity: (identity: string, type: Identity) => Promise<User | null>;
     create: (userId: number) => Promise<void>;
+    getUserAuthByRefreshToken: (refreshToken: string) => Promise<string>
 }
 
 const TokenByType = {
-    'googleToken': 'gogle',
+    'googleToken': 'google',
     'appleToken': 'apple'
 }
 type Identity = TokenType.apple | TokenType.google;
@@ -31,7 +32,7 @@ export class AuthRepository implements IAuthRepository {
         await getManager().query(
             `
           UPDATE usersauth 
-          SET refreshToken = $1
+          SET refresh_token = $1
           WHERE user_id = $2
         `,
             [refreshToken, id]
@@ -63,14 +64,28 @@ export class AuthRepository implements IAuthRepository {
 
     // need to test
     async getUserByIdentity(identity: string, type: Identity): Promise<User | null> {
-        this.manager().query(`
-            SELECT users.email, users.name, users.id, users.defaultCurrency 
+        const res = await this.manager().query(`
+            SELECT users.email, users.name, users.id
             FROM usersauth
-            WHERE ${TokenByType[type]} = $1;
             RIGHT JOIN users
-            ON usersauth.userId = users.id;
-        `, [identity])
+            ON usersauth.user_id = users.id
+            WHERE ${TokenByType[type]} = $1;
+        `, [identity]);
+        console.log('res', res);
+        if (res.length) {
+            console.log('even here');
+            return new User(res[0]);
+        }
         return null;
+    }
+
+    async getUserAuthByRefreshToken(refreshToken: string): Promise<string> {
+        const res = await this.manager().query(`
+            SELECT user_id as userId 
+            FROM usersauth
+            WHERE refresh_token = $1;
+        `, [refreshToken]);
+        return res.pop();
     }
 }
 
