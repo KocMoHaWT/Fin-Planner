@@ -6,7 +6,6 @@ import InjectableContainer from "../../application/InjectableContainer";
 export interface IUserController {
     update: (req: Request, res: Response) => Promise<any>;
     read: (req: Request, res: Response) => Promise<any>;
-    login: (req: Request, res: Response) => Promise<any>;
 }
 
 export class UserController implements IUserController {
@@ -14,10 +13,6 @@ export class UserController implements IUserController {
 
     constructor({ userService }: { userService: IUserService }) {
         this.service = userService;
-    }
-
-    async login(req: Request, res: Response) {
-        return this.service.loginUser(req, res);
     }
 
     async read(req: CustomRequest, res: Response) {

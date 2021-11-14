@@ -18,7 +18,6 @@ export default class GoogleStrategy implements IAuthentication {
         this.userService = userService;
     }
     async verify(token: string): Promise<User> {
-        console.log('token', token);
         try {
             const ticket = await this.client.verifyIdToken({
                 idToken: token,

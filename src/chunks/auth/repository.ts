@@ -61,19 +61,16 @@ export class AuthRepository implements IAuthRepository {
         return null;
     }
 
-
-    // need to test
     async getUserByIdentity(identity: string, type: Identity): Promise<User | null> {
         const res = await this.manager().query(`
-            SELECT users.email, users.name, users.id
+            SELECT users.email, users.name, users.id, user.default_currency as defaultCurrency
             FROM usersauth
             RIGHT JOIN users
             ON usersauth.user_id = users.id
             WHERE ${TokenByType[type]} = $1;
         `, [identity]);
-        console.log('res', res);
+
         if (res.length) {
-            console.log('even here');
             return new User(res[0]);
         }
         return null;

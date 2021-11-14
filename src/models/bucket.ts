@@ -29,6 +29,9 @@ import { UserAuth } from "./usersAuth";
 
     @Column({ type: "numeric", nullable: false })
     check: number;
+
+    @Column({ type: "numeric", nullable: false })
+    currentAmmount: number;
   
     @CreateDateColumn()
     createdAt: Date;
@@ -47,20 +50,8 @@ import { UserAuth } from "./usersAuth";
     @JoinColumn()
     user: User;
 
-    @ManyToOne(() => BucketType, bucketType => bucketType.id)
+    @ManyToOne(() => BucketType, bucket_type => bucket_type.id)
     @JoinColumn()
-    bucketType: BucketType;
-  
-    // @OneToMany(() => Comment, comment => comment.user)
-    // @JoinColumn({ name: 'comments'})
-    // comments: Comment[];
-  
-    // @OneToMany(() => PostLikes, post => post.user)
-    // @JoinColumn()
-    // post: PostLikes[];
-  
-    // @ManyToOne(() => Role)
-    // @JoinColumn()
-    // role: Role;
+    bucket_type: BucketType;
   }
   

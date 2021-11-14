@@ -44,7 +44,7 @@ import { UserAuth } from "./usersAuth";
 
     @OneToOne(() => Currency)
     @JoinColumn()
-    defaultCurrency: Currency;
+    default_currency: Currency;
     
     @OneToMany(() => Bucket, bucket => bucket.user)
     buckets: Bucket[];
