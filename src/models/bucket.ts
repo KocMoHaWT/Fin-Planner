@@ -14,7 +14,6 @@ import {
 import { BucketType } from "./bucketType";
 import { Currency } from "./currency";
 import { User } from "./user";
-import { UserAuth } from "./usersAuth";
   
   @Entity("buckets")
   export class Bucket {
@@ -30,8 +29,8 @@ import { UserAuth } from "./usersAuth";
     @Column({ type: "numeric", nullable: false })
     check: number;
 
-    @Column({ type: "numeric", nullable: false })
-    currentAmmount: number;
+    @Column({ type: "varchar", nullable: false })
+    tags: string;
   
     @CreateDateColumn()
     createdAt: Date;

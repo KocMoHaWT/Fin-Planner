@@ -10,9 +10,11 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
+    ManyToMany,
   } from "typeorm";
 import { BucketType } from "./bucketType";
 import { Currency } from "./currency";
+import { Income } from "./income";
 import { User } from "./user";
 import { UserAuth } from "./usersAuth";
   
@@ -21,5 +23,15 @@ import { UserAuth } from "./usersAuth";
     @PrimaryGeneratedColumn()
     id: number;
 
+    @OneToOne(() => Bucket)
+    @JoinColumn()
+    bucket: Bucket;
+
+    @OneToOne(() => Income)
+    @JoinColumn()
+    income: Income;
+
+    @Column({ type: "numeric", nullable: false })
+    sum: number;
   }
   

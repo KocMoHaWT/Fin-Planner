@@ -32,6 +32,18 @@ export class BucketRepository {
         )
     }
 
+
+    async getList(skip: number = 0, limit: number = 50): Promise<void> {
+        return await this.manager().query(
+            `
+        SELECT * 
+        FROM buckets
+        LIMIT $1 OFFSET $2
+    `,
+            [limit, skip]
+        )
+    }
+
     async update(id: number): Promise<void> {
         return await this.manager().query(
             `

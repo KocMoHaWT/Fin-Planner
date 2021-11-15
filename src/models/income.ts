@@ -11,6 +11,7 @@ import {
     ManyToOne,
     OneToMany,
   } from "typeorm";
+import { Currency } from "./currency";
 import { User } from "./user";
   
   @Entity("incomes")
@@ -23,6 +24,10 @@ import { User } from "./user";
   
     @Column({ type: "boolean", default: false})
     constant: false;
+
+    @OneToOne(() => Currency)
+    @JoinColumn()
+    currency: Currency;
   
     @ManyToOne(() => User)
     @JoinColumn()
