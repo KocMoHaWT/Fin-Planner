@@ -68,7 +68,7 @@ export class UserRepository implements IUserRepository {
         const res = await this.manager().query(
             `
         UPDATE users
-        SET name=$1, defaultCurrency=$2
+        SET name=$1, default_currency=$2
         WHERE id=$1
     `,
             [simpleUser.name, simpleUser.defaultCurrency]

@@ -1,7 +1,12 @@
 import { getManager } from "typeorm";
+import InjectableContainer from "../../application/InjectableContainer";
 
-interface IBucketRepository {
-
+export interface IBucketRepository {
+    create: (body: IBucket) => Promise<Bucket>;
+    update: (id: number, bucket: IBucket) => Promise<Response>;
+    read: (id: number) => Promise<Bucket>;
+    getList:(skip: number, limit: number) => Promise<IBucket[]>
+    delete: (id: number) => Promise<void>;
 }
 
 export class BucketRepository {
@@ -32,8 +37,8 @@ export class BucketRepository {
         )
     }
 
-
-    async getList(skip: number = 0, limit: number = 50): Promise<void> {
+///  change to better 
+    async getList(skip: number = 0, limit: number = 50): Promise<IBucket[]> {
         return await this.manager().query(
             `
         SELECT * 
@@ -44,15 +49,16 @@ export class BucketRepository {
         )
     }
 
-    async update(id: number): Promise<void> {
-        return await this.manager().query(
+    async update(id: number, bucket : IBucket): Promise<void> {
+        const res = await this.manager().query(
             `
-        SELECT * 
-        FROM buckets
-        WHERE id = $1
+        UPDATE buckets
+        SET title=$1, defaultCurrency=$2
+        WHERE id=$1
     `,
-            [id]
+            [id, bucket.title, bucket.description]
         )
+        return res;
     }
 
     async delete(id: number): Promise<void> {
@@ -66,3 +72,10 @@ export class BucketRepository {
         )
     }
 }
+
+
+const init = new Promise(() => {
+    InjectableContainer.setDependency(BucketRepository, 'bucketRepository', ['getManager']);
+});
+
+export default init;

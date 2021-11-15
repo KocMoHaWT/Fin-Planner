@@ -24,18 +24,20 @@ class Bucket {
     private _check: number
     private _currency: string;
     private _bucketType: IBucketType;
+    private _userId: number;
 
-    constructor({ id, title, description, check, currency, bucketType }: IBucket) {
+    constructor({ id, title, description, check, currency, bucketType, userId }: IBucket) {
         this._id = id;
         this._title = title;
         this._check = check;
         this._description = description;
         this._currency = currency;
         this._bucketType = bucketType;
+        this._userId = userId;
     }
 
 
-    toJSON() {
+    toJSON(): IBucket {
         return {
             id: this._id,
             title: this._title,
@@ -43,6 +45,7 @@ class Bucket {
             description: this._description,
             currency: this._currency,
             bucketType: this._bucketType,
+            userId: this._userId,
         }
     }
 
@@ -52,6 +55,5 @@ class Bucket {
         this._description = bucket?.description || this._description;
         this._currency = bucket.currency || this._currency;
         this._bucketType = bucket.bucketType || this._bucketType;
-
     }
 }

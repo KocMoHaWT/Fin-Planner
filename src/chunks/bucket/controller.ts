@@ -1,33 +1,47 @@
 import { CustomRequest } from "../../interfaces/request";
 import { IBucketService } from "./service";
+import { Response, Request } from "express";
+import InjectableContainer from "../../application/InjectableContainer";
 
-interface IBucketController {
+export interface IBucketController {
     read: (req: Request, res: Response) => Promise<any>;
+    getList: (req: Request, res: Response) => Promise<any>;
     delete: (req: Request, res: Response) => Promise<any>;
     update: (req: Request, res: Response) => Promise<any>;
     create: (req: Request, res: Response) => Promise<any>;
 }
 
-export class BucketController {
+export class BucketController implements IBucketController {
   private service: IBucketService;
 
     constructor({ userService }: { userService: IBucketService }) {
         this.service = userService;
     }
 
-    async create(req: Request, res: Response) {
-        // return this.service.loginUser(req, res);
+    async create(req: CustomRequest, res: Response) {
+        return this.service.create(req, res);
     }
 
-    async delete(req: Request, res: Response) {
-        // return this.service.loginUser(req, res);
+    async delete(req: CustomRequest, res: Response) {
+        return this.service.delete(req, res);
+    }
+
+    async getList(req: CustomRequest, res: Response) {
+        return this.service.getList(req, res);
     }
 
     async read(req: CustomRequest, res: Response) {
-        // return this.service.sendUserToFront(req, res);
+        return this.service.read(req, res);
     }
 
-    async update(req: Request, res: Response) {
-        // return this.service.updateUser(req, res);
+    async update(req: CustomRequest, res: Response) {
+        return this.service.update(req, res);
     }
 }
+
+
+const init = new Promise(() => {
+    InjectableContainer.setDependency(BucketController, 'bucketController', ['bucketService']);
+});
+
+export default init;

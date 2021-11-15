@@ -48,7 +48,7 @@ export class AuthService implements IAuthService {
             const userId = await this.repository.getUserAuthByRefreshToken(token);
             if (!userId) return res.status(401).end('error no userId');
             const tokens = await jwtFactory.createTokenPair(+userId);
-            res.status(200).json(tokens);
+            return res.status(200).json(tokens);
         } catch (error) {
             return res.status(400).json({ error });
         }
