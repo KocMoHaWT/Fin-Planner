@@ -1,23 +1,23 @@
 import { getManager } from "typeorm";
 import InjectableContainer from "../../application/InjectableContainer";
-import { Bucket, IBucket } from "./bucket";
+import { Income, IIncome } from "./income";
 
-export interface IBucketRepository {
-    create: (body: IBucket) => Promise<Bucket>;
-    update: (id: number, bucket: IBucket) => Promise<Response>;
-    read: (id: number) => Promise<Bucket>;
-    getList:(skip: number, limit: number) => Promise<IBucket[]>
+export interface IIncomeRepository {
+    create: (body: IIncome) => Promise<Income>;
+    update: (id: number, bucket: IIncome) => Promise<Response>;
+    read: (id: number) => Promise<Income>;
+    getList:(skip: number, limit: number) => Promise<IIncome[]>
     delete: (id: number) => Promise<void>;
 }
 
-export class BucketRepository {
+export class IncomeRepository {
     private manager: typeof getManager;
 
     constructor({ manager }: { manager: typeof getManager }) {
         this.manager = manager;
     }
 
-    async create(bucket: IBucket): Promise<void> {
+    async create(bucket: IIncome): Promise<void> {
         return await this.manager().query(
             `
         INSERT INTO buckets (title, description, check, currency)
@@ -39,7 +39,7 @@ export class BucketRepository {
     }
 
 ///  change to better 
-    async getList(skip: number = 0, limit: number = 50): Promise<IBucket[]> {
+    async getList(skip: number = 0, limit: number = 50): Promise<IIncome[]> {
         return await this.manager().query(
             `
         SELECT * 
@@ -50,7 +50,7 @@ export class BucketRepository {
         )
     }
 
-    async update(id: number, bucket : IBucket): Promise<void> {
+    async update(id: number, bucket : IIncome): Promise<void> {
         const res = await this.manager().query(
             `
         UPDATE buckets
@@ -76,7 +76,7 @@ export class BucketRepository {
 
 
 const init = new Promise(() => {
-    InjectableContainer.setDependency(BucketRepository, 'bucketRepository', ['getManager']);
+    InjectableContainer.setDependency(IncomeRepository, 'bucketRepository', ['getManager']);
 });
 
 export default init;

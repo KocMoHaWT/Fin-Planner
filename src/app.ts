@@ -7,7 +7,7 @@ import autInit from './chunks/auth';
 import userInit from './chunks/user';
 import * as cookieParser from 'cookie-parser';
 
-const routers = ['authRouter', 'userRouter'];
+const routers = ['authRouter', 'userRouter', 'incomeRouter', 'bucketRouter'];
 
 const app = express();
 const server = new Server(app, connection, 3001);

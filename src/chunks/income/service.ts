@@ -1,10 +1,10 @@
 import { CustomRequest } from "../../interfaces/request";
-import { BucketRepository, IBucketRepository } from "./repository";
+import { IncomeRepository, IIncomeRepository } from "./repository";
 import { Response, Request } from "express";
 import InjectableContainer from "../../application/InjectableContainer";
-import { Bucket } from "./bucket";
+import { Income } from "./income";
 
-export interface IBucketService {
+export interface IIncomeService {
     create: (req: CustomRequest, res: Response) => Promise<Response>;
     update: (req: CustomRequest, res: Response) => Promise<Response>;
     getList: (req: CustomRequest, res: Response) => Promise<Response>;
@@ -12,22 +12,22 @@ export interface IBucketService {
     delete: (req: CustomRequest, res: Response) => Promise<void>;
 }
 
-export class BucketService implements IBucketService {
-    private repository: IBucketRepository;
+export class IncomeService implements IIncomeService {
+    private repository: IIncomeRepository;
 
-    constructor({ bucketRepository }: { bucketRepository: IBucketRepository }) {
-        this.repository = bucketRepository;
+    constructor({ incomeRepository }: { incomeRepository: IIncomeRepository }) {
+        this.repository = incomeRepository;
     }
 
     async create(req: CustomRequest, res: Response): Promise<Response> {
-        const data = new Bucket(req.body)
-        const newBucket =  await this.repository.create(data.toJSON());
-        return res.status(200).json({ bucket: newBucket.toJSON()});
+        const data = new Income(req.body)
+        const newIncome =  await this.repository.create(data.toJSON());
+        return res.status(200).json({ income: newIncome.toJSON()});
     }
 
     async update(req: CustomRequest, res: Response): Promise<Response> {
-        const bucket = new Bucket(req.body)
-        return res.status(200).json({...bucket});
+        const income = new Income(req.body)
+        return res.status(200).json({...income});
     }
 
     async delete(req: CustomRequest, res: Response): Promise<void> {
@@ -36,18 +36,18 @@ export class BucketService implements IBucketService {
     }
 
     async read(req: CustomRequest, res: Response): Promise<Response>  {
-        const bucket = await this.repository.read(+req.params.id);
-        return res.status(200).json({...bucket});
+        const income = await this.repository.read(+req.params.id);
+        return res.status(200).json({...income});
     }
 
     async getList(req: CustomRequest, res: Response): Promise<Response>  {
-        const buckets = await this.repository.getList(+req.params.offset, +req.params.limit);
-        return res.status(200).json(buckets);
+        const incomes = await this.repository.getList(+req.params.offset, +req.params.limit);
+        return res.status(200).json(incomes);
     }
 }
 
 const init = new Promise(() => {
-    InjectableContainer.setDependency(BucketService, 'bucketService', ['bucketRepository']);
+    InjectableContainer.setDependency(IncomeService, 'incomeService', ['incomeRepository']);
 });
 
 export default init;

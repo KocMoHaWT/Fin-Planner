@@ -11,6 +11,7 @@ import {
     ManyToOne,
     OneToMany,
   } from "typeorm";
+import { Status } from "../chunks/bucket/bucket";
 import { BucketType } from "./bucketType";
 import { Currency } from "./currency";
 import { User } from "./user";
@@ -31,6 +32,9 @@ import { User } from "./user";
 
     @Column({ type: "varchar", nullable: false })
     tags: string;
+
+    @Column({ type: 'enum', nullable: false, default: Status.empty })
+    status: Status;
   
     @CreateDateColumn()
     createdAt: Date;
