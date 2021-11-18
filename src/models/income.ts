@@ -2,16 +2,12 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    BeforeInsert,
-    CreateDateColumn,
-    UpdateDateColumn,
-    DeleteDateColumn,
     OneToOne,
     JoinColumn,
     ManyToOne,
-    OneToMany,
   } from "typeorm";
 import { Currency } from "./currency";
+import { DateType } from "./date";
 import { User } from "./user";
   
   @Entity("incomes")
@@ -21,16 +17,21 @@ import { User } from "./user";
   
     @Column({ type: "varchar", length: 200, nullable: false })
     name: string;
-  
-    @Column({ type: "boolean", default: false})
-    constant: false;
+    
 
     @OneToOne(() => Currency)
     @JoinColumn()
     currency: Currency;
+
+    @Column({ type: "boolean" })
+    regular: boolean;
+
+    @OneToOne(() => DateType)
+    @JoinColumn()
+    period: DateType;
   
     @ManyToOne(() => User)
     @JoinColumn()
-    account: User[];
+    user: User[];
   }
   

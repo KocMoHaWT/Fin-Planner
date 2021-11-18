@@ -14,6 +14,8 @@ import {
 import { Status } from "../chunks/bucket/bucket";
 import { BucketType } from "./bucketType";
 import { Currency } from "./currency";
+import { Income } from "./income";
+import { DateType } from "./date";
 import { User } from "./user";
   
   @Entity("buckets")
@@ -35,7 +37,7 @@ import { User } from "./user";
 
     @Column({ type: 'enum', nullable: false, default: Status.empty })
     status: Status;
-  
+
     @CreateDateColumn()
     createdAt: Date;
   
@@ -44,6 +46,14 @@ import { User } from "./user";
   
     @DeleteDateColumn()
     deleteAt: Date;
+
+    @OneToOne(() => DateType)
+    @JoinColumn()
+    period: DateType;
+  
+    @OneToOne(() => Income)
+    @JoinColumn()
+    linked_income: Income;
 
     @OneToOne(() => Currency)
     @JoinColumn()

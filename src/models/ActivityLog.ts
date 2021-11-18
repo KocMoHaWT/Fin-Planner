@@ -27,11 +27,11 @@ import { UserAuth } from "./usersAuth";
     @JoinColumn()
     bucket: Bucket;
 
+    @Column({ type: "numeric", nullable: false })
+    sum: number;
+
     @OneToOne(() => Income)
     @JoinColumn()
     income: Income;
-
-    @Column({ type: "numeric", nullable: false })
-    sum: number;
   }
   

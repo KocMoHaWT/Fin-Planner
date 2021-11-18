@@ -11,43 +11,29 @@ import {
     ManyToOne,
     OneToMany,
   } from "typeorm";
+import { Income } from "./income";
   
   @Entity("bucketsTypes")
   export class BucketType {
     @PrimaryGeneratedColumn()
     id: number;
-  
-    @Column({ type: "varchar", length: 200, nullable: false })
-    title: string;
-  
-    @Column({ type: "numeric", nullable: false })
-    min_check: number;
 
-    @Column({ type: "numeric", nullable: false })
-    max_check: number;
-  
-    @Column({ type: "boolean", nullable: false })
-    leftover: boolean;
-  
-    @Column({ type: "boolean", nullable: false })
+    @Column({ type: "varchar", length: 200, nullable: true })
+    title: string;
+
+    @Column({ type: "boolean", nullable: true })
     regular: boolean;
 
-    @Column({ type: "boolean", nullable: false })
+    @Column({ type: "boolean", nullable: true })
+    strict: boolean;
+
+    @Column({ type: "boolean", nullable: true })
     planned: boolean;
+
+    @Column({ type: "boolean", nullable: true })
+    leftover: boolean;
   
     @DeleteDateColumn()
     deleteAt: Date;
-    
-    // @OneToMany(() => Comment, comment => comment.user)
-    // @JoinColumn({ name: 'comments'})
-    // comments: Comment[];
-  
-    // @OneToMany(() => PostLikes, post => post.user)
-    // @JoinColumn()
-    // post: PostLikes[];
-  
-    // @ManyToOne(() => Role)
-    // @JoinColumn()
-    // role: Role;
   }
   
