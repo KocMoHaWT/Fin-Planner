@@ -13,12 +13,12 @@ import {
   } from "typeorm";
 import { Income } from "./income";
   
-  @Entity("bucketsTypes")
+  @Entity("bucket_types")
   export class BucketType {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: "varchar", length: 200, nullable: true })
+    @Column({ type: "varchar", length: 200, nullable: false })
     title: string;
 
     @Column({ type: "boolean", nullable: true })
@@ -32,8 +32,5 @@ import { Income } from "./income";
 
     @Column({ type: "boolean", nullable: true })
     leftover: boolean;
-  
-    @DeleteDateColumn()
-    deleteAt: Date;
   }
   

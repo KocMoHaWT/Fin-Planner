@@ -18,6 +18,8 @@ import { User } from "./user";
     @Column({ type: "varchar", length: 200, nullable: false })
     name: string;
     
+    @Column({ type: "numeric", nullable: false })
+    amount: number;
 
     @OneToOne(() => Currency)
     @JoinColumn()

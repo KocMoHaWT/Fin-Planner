@@ -13,5 +13,5 @@ export default createConnection({
     },
     entities: ["./src/models/*.ts"],
     synchronize: true,
-    logging: true
+    logging: true,
 });

@@ -1,40 +1,36 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    OneToOne,
-    JoinColumn,
-  } from "typeorm";
-import { Bucket } from "../chunks/bucket/bucket";
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
+import { Bucket } from "./bucket";
 import { PeriodType } from "../interfaces/periodType";
 import { Income } from "./income";
-  
-  @Entity("dates")
-  export class DateType {
-    @PrimaryGeneratedColumn()
-    id: number;
-  
-    @Column({ type: "varchar", length: 200, nullable: false })
-    title: string;
-  
-    @Column({ type: "boolean", default: false})
-    code: false;
 
-    @Column({ type: "numeric", nullable: false })
-    amount: number;
+@Entity("dates")
+export class DateType {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: "date"})
-    date: Date;
+  @Column({ type: "varchar", length: 200, nullable: false })
+  title: string;
 
-    @Column({ type: "enum", default: PeriodType.once })
-    period: PeriodType
+  @Column({ type: "boolean", default: false })
+  code: false;
 
-    @OneToOne(() => Income)
-    @JoinColumn()
-    income: Income;
+  @Column({ type: "date" })
+  date: Date;
 
-    @OneToOne(() => Bucket)
-    @JoinColumn()
-    bucket: Bucket;
-  }
-  
+  @Column({ type: "enum", enum: PeriodType, default: PeriodType.once })
+  period: PeriodType
+
+  @OneToOne(() => Income)
+  @JoinColumn()
+  income: Income;
+
+  @OneToOne(() => Bucket)
+  @JoinColumn()
+  bucket: Bucket;
+}
