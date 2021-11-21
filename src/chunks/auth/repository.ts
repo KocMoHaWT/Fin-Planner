@@ -8,7 +8,7 @@ export interface IAuthRepository {
     saveRefreshToken: (refreshToken: string, id: number) => Promise<void>;
     addIdentity: (id: number, identity: string, type: Identity) => Promise<void>;
     getUserByIdentity: (identity: string, type: Identity) => Promise<User | null>;
-    create: (userId: number) => Promise<void>;
+    create: (userId: number, google: string) => Promise<void>;
     getUserAuthByRefreshToken: (refreshToken: string) => Promise<string>
 }
 
@@ -39,13 +39,13 @@ export class AuthRepository implements IAuthRepository {
         );
     };
 
-    async create(userId: number) {
+    async create(userId: number, google: string) {
         return await this.manager().query(
             `
-        INSERT INTO usersauth (user_id)
-        VALUES ($1);
+        INSERT INTO usersauth (user_id, google)
+        VALUES ($1, $2);
     `,
-            [userId]
+            [userId, google]
         )
     }
 
@@ -63,7 +63,7 @@ export class AuthRepository implements IAuthRepository {
 
     async getUserByIdentity(identity: string, type: Identity): Promise<User | null> {
         const res = await this.manager().query(`
-            SELECT users.email, users.name, users.id, user.default_currency as defaultCurrency
+            SELECT users.email, users.name, users.id
             FROM usersauth
             RIGHT JOIN users
             ON usersauth.user_id = users.id

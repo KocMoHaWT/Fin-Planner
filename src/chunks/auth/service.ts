@@ -23,7 +23,7 @@ export interface IAuthService {
     loginUser: (req: Request, res: Response) => Promise<void | Response>;
     logout: (req: Request, res: Response) => Promise<void | Response>;
     getUserByGoogleId: (token: string) => Promise<User>;
-    create: (userId: number) => Promise<void>
+    create: (userId: number, googleToken: string) => Promise<void>
     refreshToken: (req: Request, res: Response) => Promise<void | Response>;
 }
 
@@ -114,8 +114,8 @@ export class AuthService implements IAuthService {
         }
     }
 
-    async create(userId: number) {
-        await this.repository.create(userId);
+    async create(userId: number, googleToken: string) {
+        await this.repository.create(userId, googleToken);
     }
 
     async getUserByGoogleId(id: string) {
@@ -142,7 +142,7 @@ export class AuthService implements IAuthService {
             const authUser = new AuthenticationData({ email: req.body.email, name: req.body.name, password: req.body.password })
             if (isExists) return res.status(409).end();
             const user = await this.userService.create(authUser);
-            await this.create(user.id);
+            await this.create(user.id, null);
             if (!user) {
                 throw new Error('error in save');
             }

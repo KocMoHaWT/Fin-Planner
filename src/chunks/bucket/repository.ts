@@ -1,13 +1,16 @@
 import { getManager } from "typeorm";
 import InjectableContainer from "../../application/InjectableContainer";
+import { IBucketType } from "../../interfaces/bucketType";
 import { Bucket, IBucket } from "./bucket";
+import bucketFactory from "./bucketFactory";
 
 export interface IBucketRepository {
-    create: (body: IBucket) => Promise<Bucket>;
+    create: (body: IBucket, userId: number) => Promise<Bucket>;
     update: (id: number, bucket: IBucket) => Promise<Response>;
     read: (id: number) => Promise<Bucket>;
-    getList:(skip: number, limit: number) => Promise<IBucket[]>
+    getList: (skip: number, limit: number) => Promise<IBucket[]>;
     delete: (id: number) => Promise<void>;
+    getBucketTypeList: (skip: number, limit: number) => Promise<IBucketType[]>;
 }
 
 export class BucketRepository {
@@ -17,18 +20,22 @@ export class BucketRepository {
         this.manager = manager;
     }
 
-    async create(bucket: IBucket): Promise<void> {
-        return await this.manager().query(
+    async create(bucket: IBucket, userId: number): Promise<IBucket> {
+        const res = await this.manager().query(
             `
-        INSERT INTO buckets (title, description, check, currency)
-        VALUES ($1, $2, $3);
+        INSERT INTO buckets (title, description, ammount, user_id)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
     `,
-            [bucket.title, bucket.description, bucket.check, bucket.currency]
+            [bucket.title, bucket.description, bucket.ammount, userId]
         )
+        const newBucket = res.pop()
+        console.log('===>', newBucket);
+        return bucketFactory.createFromDb({dbBucketData: newBucket, bucketType: {} as any});
     }
 
-    async read(id: number): Promise<void> {
-        return await this.manager().query(
+    async read(id: number): Promise<IBucket> {
+        const res = await this.manager().query(
             `
         SELECT * 
         FROM buckets
@@ -36,9 +43,14 @@ export class BucketRepository {
     `,
             [id]
         )
+
+        if (res.length) {
+            return bucketFactory.createFromDb(res.pop());
+        }
+        return null;
     }
 
-///  change to better 
+    ///  change to better 
     async getList(skip: number = 0, limit: number = 50): Promise<IBucket[]> {
         return await this.manager().query(
             `
@@ -50,7 +62,7 @@ export class BucketRepository {
         )
     }
 
-    async update(id: number, bucket : IBucket): Promise<void> {
+    async update(id: number, bucket: IBucket): Promise<IBucket> {
         const res = await this.manager().query(
             `
         UPDATE buckets
@@ -59,7 +71,10 @@ export class BucketRepository {
     `,
             [id, bucket.title, bucket.description]
         )
-        return res;
+        if (res.length) {
+            return bucketFactory.createFromDb(res.pop());
+        }
+        return null;
     }
 
     async delete(id: number): Promise<void> {
@@ -72,11 +87,23 @@ export class BucketRepository {
             [id]
         )
     }
+
+    async getBucketTypeList(skip: number = 0, limit: number = 50): Promise<IBucketType[]> {
+        return await this.manager().query(
+            `
+        SELECT * 
+        FROM bucket_types
+        LIMIT $1 OFFSET $2;
+    `,
+            [limit, skip]
+        )
+    }
+
 }
 
 
 const init = new Promise(() => {
-    InjectableContainer.setDependency(BucketRepository, 'bucketRepository', ['getManager']);
+    InjectableContainer.setDependency(BucketRepository, 'bucketRepository', ['manager']);
 });
 
 export default init;

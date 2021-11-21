@@ -1,39 +1,40 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    OneToOne,
-    JoinColumn,
-    ManyToOne,
-  } from "typeorm";
+  Entity,
+  PrimaryColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+  ManyToOne,
+} from "typeorm";
+import { PeriodType } from "../interfaces/periodType";
 import { Currency } from "./currency";
-import { DateType } from "./date";
 import { User } from "./user";
-  
-  @Entity("incomes")
-  export class Income {
-    @PrimaryGeneratedColumn()
-    id: number;
-  
-    @Column({ type: "varchar", length: 200, nullable: false })
-    name: string;
-    
-    @Column({ type: "numeric", nullable: false })
-    amount: number;
 
-    @OneToOne(() => Currency)
-    @JoinColumn()
-    currency: Currency;
+@Entity("incomes")
+export class Income {
+  @PrimaryColumn()
+  id: number;
 
-    @Column({ type: "boolean" })
-    regular: boolean;
+  @Column({ type: "varchar", length: 200, nullable: false })
+  name: string;
 
-    @OneToOne(() => DateType)
-    @JoinColumn()
-    period: DateType;
-  
-    @ManyToOne(() => User)
-    @JoinColumn()
-    user: User[];
-  }
-  
+  @Column({ type: "numeric", nullable: false })
+  amount: number;
+
+  @Column({ type: "date" })
+  date: Date;
+
+  @Column({ type: "enum", enum: PeriodType, default: PeriodType.once })
+  period: PeriodType;
+
+  @Column({ type: "boolean" })
+  regular: boolean;
+
+  @OneToOne(() => Currency)
+  @JoinColumn()
+  currency: Currency;
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  user: User[];
+}

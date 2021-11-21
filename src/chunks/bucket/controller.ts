@@ -9,13 +9,14 @@ export interface IBucketController {
     delete: (req: Request, res: Response) => Promise<any>;
     update: (req: Request, res: Response) => Promise<any>;
     create: (req: Request, res: Response) => Promise<any>;
+    getBucketTypeList: (req: Request, res: Response) => Promise<any>;
 }
 
 export class BucketController implements IBucketController {
   private service: IBucketService;
 
-    constructor({ userService }: { userService: IBucketService }) {
-        this.service = userService;
+    constructor({ bucketService }: { bucketService: IBucketService }) {
+        this.service = bucketService;
     }
 
     async create(req: CustomRequest, res: Response) {
@@ -36,6 +37,11 @@ export class BucketController implements IBucketController {
 
     async update(req: CustomRequest, res: Response) {
         return this.service.update(req, res);
+    }
+
+    async getBucketTypeList(req: CustomRequest, res: Response) {
+        console.log('qew',this.service);
+        return this.service.getBucketTypeList(req, res);
     }
 }
 

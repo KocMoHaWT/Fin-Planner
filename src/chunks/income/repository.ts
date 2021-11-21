@@ -6,7 +6,7 @@ export interface IIncomeRepository {
     create: (body: IIncome) => Promise<Income>;
     update: (id: number, bucket: IIncome) => Promise<Response>;
     read: (id: number) => Promise<Income>;
-    getList:(skip: number, limit: number) => Promise<IIncome[]>
+    getList:(skip: number, limit: number, id: number) => Promise<IIncome[]>
     delete: (id: number) => Promise<void>;
 }
 
@@ -39,14 +39,15 @@ export class IncomeRepository {
     }
 
 ///  change to better 
-    async getList(skip: number = 0, limit: number = 50): Promise<IIncome[]> {
+    async getList(skip: number = 0, limit: number = 50, id: number): Promise<IIncome[]> {
         return await this.manager().query(
             `
         SELECT * 
         FROM buckets
         LIMIT $1 OFFSET $2
+        WHERE user_id = $3
     `,
-            [limit, skip]
+            [limit, skip, id]
         )
     }
 
@@ -76,7 +77,7 @@ export class IncomeRepository {
 
 
 const init = new Promise(() => {
-    InjectableContainer.setDependency(IncomeRepository, 'bucketRepository', ['getManager']);
+    InjectableContainer.setDependency(IncomeRepository, 'incomeRepository', ['manager']);
 });
 
 export default init;

@@ -14,8 +14,8 @@ export interface IIncomeController {
 export class IncomeController implements IIncomeController {
   private service: IIncomeService;
 
-    constructor({ userService }: { userService: IIncomeService }) {
-        this.service = userService;
+    constructor({ incomeService }: { incomeService: IIncomeService }) {
+        this.service = incomeService;
     }
 
     async create(req: CustomRequest, res: Response) {

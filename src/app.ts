@@ -5,9 +5,11 @@ import connection from './db';
 import InjectableContainer from './application/InjectableContainer';
 import autInit from './chunks/auth';
 import userInit from './chunks/user';
+import bucketInit from './chunks/bucket';
+import incomeInit from './chunks/income';
 import * as cookieParser from 'cookie-parser';
 
-const routers = ['authRouter', 'userRouter'];
+const routers = ['authRouter', 'userRouter', 'bucketRouter', 'incomeRouter'];
 
 const app = express();
 const server = new Server(app, connection, 3001);
@@ -23,7 +25,7 @@ const globalMiddleware: Array<RequestHandler> = [
 Promise.resolve()
     .then(() => server.initDatabase())
     .then(() => {
-       Promise.all([ ...userInit, ...autInit])
+       Promise.all([ ...userInit, ...autInit, ...bucketInit, ...incomeInit])
     })
     .then(() => {
         server.loadGlobalMiddleware(globalMiddleware);

@@ -1,6 +1,6 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
+    PrimaryColumn,
     Column,
     BeforeInsert,
     CreateDateColumn,
@@ -20,7 +20,7 @@ import { UserAuth } from "./usersAuth";
   
   @Entity("activityLogs")
   export class Bucket {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: number;
 
     @OneToOne(() => Bucket)

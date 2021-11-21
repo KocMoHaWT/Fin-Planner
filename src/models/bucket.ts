@@ -15,8 +15,8 @@ import { Status } from "../chunks/bucket/bucket";
 import { BucketType } from "./bucketType";
 import { Currency } from "./currency";
 import { Income } from "./income";
-import { DateType } from "./date";
 import { User } from "./user";
+import { PeriodType } from "../interfaces/periodType";
 
 @Entity("buckets")
 export class Bucket {
@@ -26,17 +26,23 @@ export class Bucket {
   @Column({ type: "varchar", length: 200, nullable: false })
   title: string;
 
-  @Column({ type: "varchar", nullable: false })
+  @Column({ type: "varchar", nullable: true })
   description: string;
 
   @Column({ type: "numeric", nullable: false })
-  check: number;
+  ammount: number;
 
-  @Column({ type: "varchar", nullable: false })
+  @Column({ type: "varchar", nullable: true })
   tags: string;
 
   @Column({ type: 'enum', nullable: false, enum: Status, default: Status.empty })
   status: Status;
+
+  @Column({ type: "date", nullable: true })
+  date: Date;
+
+  @Column({ type: "enum", enum: PeriodType, default: PeriodType.once })
+  period: PeriodType;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -47,23 +53,19 @@ export class Bucket {
   @DeleteDateColumn()
   deleteAt: Date;
 
-  @OneToOne(() => DateType)
-  @JoinColumn()
-  period: DateType;
-
-  @OneToOne(() => Income)
-  @JoinColumn()
+  @OneToOne(() => Income, { nullable: true })
+  @JoinColumn({ name: 'linked_income_id' })
   linked_income: Income;
 
-  @OneToOne(() => Currency)
-  @JoinColumn()
+  @OneToOne(() => Currency, { nullable: true })
+  @JoinColumn({ name: 'currency_id' })
   currency: Currency;
 
   @ManyToOne(() => User, user => user.buckets)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => BucketType, bucket_type => bucket_type.id)
-  @JoinColumn()
+  @ManyToOne(() => BucketType, bucket_type => bucket_type.id, { nullable: true })
+  @JoinColumn({ name: 'bucket_type_id' })
   bucket_type: BucketType;
 }

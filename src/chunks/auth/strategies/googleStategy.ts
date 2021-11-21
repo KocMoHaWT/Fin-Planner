@@ -32,7 +32,7 @@ export default class GoogleStrategy implements IAuthentication {
                 const authUser = new AuthenticationData({ email: payload?.email, name: payload?.name })
                 // todo develop transaction here or another save way to update both table
                 const newUser = await this.userService.create(authUser);
-                await this.authService.create(newUser.id);
+                await this.authService.create(newUser.id, payload['sub']);
                 return newUser;
             }
             return user;

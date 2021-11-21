@@ -3,6 +3,7 @@ import { BucketRepository, IBucketRepository } from "./repository";
 import { Response, Request } from "express";
 import InjectableContainer from "../../application/InjectableContainer";
 import { Bucket } from "./bucket";
+import { IBucketType } from "../../interfaces/bucketType";
 
 export interface IBucketService {
     create: (req: CustomRequest, res: Response) => Promise<Response>;
@@ -10,6 +11,7 @@ export interface IBucketService {
     getList: (req: CustomRequest, res: Response) => Promise<Response>;
     read: (req: CustomRequest, res: Response) => Promise<Response>;
     delete: (req: CustomRequest, res: Response) => Promise<void>;
+    getBucketTypeList: (req: CustomRequest, res: Response) => Promise<Response<IBucketType[]>>;
 }
 
 export class BucketService implements IBucketService {
@@ -21,7 +23,8 @@ export class BucketService implements IBucketService {
 
     async create(req: CustomRequest, res: Response): Promise<Response> {
         const data = new Bucket(req.body)
-        const newBucket =  await this.repository.create(data.toJSON());
+        const newBucket =  await this.repository.create(data.toJSON(), req.user.id);
+        console.log('id', newBucket);
         return res.status(200).json({ bucket: newBucket.toJSON()});
     }
 
@@ -42,6 +45,11 @@ export class BucketService implements IBucketService {
 
     async getList(req: CustomRequest, res: Response): Promise<Response>  {
         const buckets = await this.repository.getList(+req.params.offset, +req.params.limit);
+        return res.status(200).json(buckets);
+    }
+
+    async getBucketTypeList(req: CustomRequest, res: Response): Promise<Response<IBucketType[]>>  {
+        const buckets = await this.repository.getBucketTypeList(+req.params.offset || 0, +req.params.limit || 50);
         return res.status(200).json(buckets);
     }
 }

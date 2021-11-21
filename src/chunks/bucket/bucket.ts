@@ -1,11 +1,5 @@
-interface IBucketType {
-    title: string;
-    minCheck: number;
-    maxCheck: number;
-    leftOver: number;
-    regular: boolean;
-    planned: boolean; /// need to think of how handle date
-}
+import { IBucketType } from "../../interfaces/bucketType";
+import { PeriodType } from "../../interfaces/periodType";
 
 export enum Status {
     done = 'done',
@@ -17,53 +11,71 @@ export interface IBucket {
     id: number;
     title: string;
     description: string;
-    check: number;
+    ammount: number;
     currency: string; // change to interface
-    bucketType: IBucketType;
+    bucketType: IBucketType | number;
     userId: number;
     status: Status;
+    period?: PeriodType;
+    date?: Date;
+    linkedIncome?: number;
+    tags?: string;
 }
 
-export class Bucket {
-    private _id: number;
-    private _title: string;
-    private _description: string;
-    private _check: number
-    private _currency: string;
-    private _bucketType: IBucketType;
-    private _userId: number;
-    private _status: Status;
 
-    constructor({ id, title, description, check, currency, bucketType, userId, status }: IBucket) {
-        this._id = id;
-        this._title = title;
-        this._check = check;
-        this._description = description;
-        this._currency = currency;
-        this._bucketType = bucketType;
-        this._userId = userId;
-        this._status = status;
+export class Bucket implements IBucket{
+    id: number;
+    title: string;
+    description: string;
+    ammount: number;
+    currency: string;
+    bucketType: number | IBucketType;
+    userId: number;
+    status: Status;
+    period?: PeriodType;
+    date?: Date;
+    linkedIncome?: number;
+    tags?: string;
+
+    constructor({ id, title, description, tags, ammount, currency, bucketType, userId, status, period, date, linkedIncome }: IBucket) {
+        this.id = id;
+        this.title = title;
+        this.ammount = ammount;
+        this.description = description;
+        this.currency = currency;
+        this.bucketType = bucketType;
+        this.userId = userId;
+        this.status = status;
+        this.period = period;
+        this.date = date;
+        this.linkedIncome = linkedIncome;
+        this.tags = tags
     }
+
 
 
     toJSON(): IBucket {
         return {
-            id: this._id,
-            title: this._title,
-            check: this._check,
-            description: this._description,
-            currency: this._currency,
-            bucketType: this._bucketType,
-            userId: this._userId,
-            status: this._status
+            id: this.id,
+            title: this.title,
+            ammount: this.ammount,
+            description: this.description,
+            currency: this.currency,
+            bucketType: this.bucketType,
+            userId: this.userId,
+            status: this.status,
+            period: this.period,
+            date: this.date,
+            linkedIncome: this.linkedIncome,
+            tags: this.tags,
         }
     }
 
     set(bucket: Partial<IBucket>) {
-        this._title = bucket?.title || this._title;
-        this._check = bucket?.check || this._check;
-        this._description = bucket?.description || this._description;
-        this._currency = bucket.currency || this._currency;
-        this._bucketType = bucket.bucketType || this._bucketType;
+        this.title = bucket?.title || this.title;
+        this.ammount = bucket?.ammount || this.ammount;
+        this.description = bucket?.description || this.description;
+        this.currency = bucket.currency || this.currency;
+        this.bucketType = bucket.bucketType || this.bucketType;
     }
 }
