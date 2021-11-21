@@ -74,9 +74,7 @@ export class AuthService implements IAuthService {
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
         let authContext = new AuthenticationContext();
         const authHeader = req.headers["authorization"];
-        console.log(authHeader);
         const tokenInHeader = authHeader && authHeader.split(" ")[1];
-        console.log('tokenINheader', tokenInHeader);
         let token;
         let type;
         if (authHeader && tokenInHeader) {

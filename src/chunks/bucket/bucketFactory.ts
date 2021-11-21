@@ -22,7 +22,6 @@ class BucketFactory {
 
     createFromDb({ dbBucketData, bucketType }: { dbBucketData: bucketData, bucketType: BucketType }): IBucket {
         // validate data
-        console.log('dbBucketData',dbBucketData);
         const { linked_income_id: linkedIncome = null, user_id: userId, ...bucketData } = dbBucketData;
         const newBucket = {
             ...bucketData,

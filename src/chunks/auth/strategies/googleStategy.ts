@@ -19,15 +19,18 @@ export default class GoogleStrategy implements IAuthentication {
     }
     async verify(token: string): Promise<User> {
         try {
+            console.log('ticket');
             const ticket = await this.client.verifyIdToken({
                 idToken: token,
                 audience: envs.googleId,  // Specify the CLIENT_ID of the app that accesses the backend
             });
+            console.log('ticket',ticket);
             const payload = ticket.getPayload();
             // check if exists 
             // if yes return user
             // if not save anad return user
             const user = await this.authService.getUserByGoogleId(payload['sub']);
+          
             if (!user) {
                 const authUser = new AuthenticationData({ email: payload?.email, name: payload?.name })
                 // todo develop transaction here or another save way to update both table
@@ -37,6 +40,7 @@ export default class GoogleStrategy implements IAuthentication {
             }
             return user;
         } catch(e) {
+
             throw new Error(e);
         }
     }

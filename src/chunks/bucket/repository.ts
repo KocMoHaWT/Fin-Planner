@@ -6,10 +6,10 @@ import bucketFactory from "./bucketFactory";
 
 export interface IBucketRepository {
     create: (body: IBucket, userId: number) => Promise<Bucket>;
-    update: (id: number, bucket: IBucket) => Promise<Response>;
-    read: (id: number) => Promise<Bucket>;
+    update: (bucket: IBucket) => Promise<Response>;
+    read: (id: number, userId: number) => Promise<Bucket>;
     getList: (skip: number, limit: number) => Promise<IBucket[]>;
-    delete: (id: number) => Promise<void>;
+    delete: (id: number, userId: number) => Promise<void>;
     getBucketTypeList: (skip: number, limit: number) => Promise<IBucketType[]>;
 }
 
@@ -21,31 +21,49 @@ export class BucketRepository {
     }
 
     async create(bucket: IBucket, userId: number): Promise<IBucket> {
+        const bucketTypeId = typeof bucket.bucketType === 'number' ? bucket.bucketType : bucket.bucketType.id;
         const res = await this.manager().query(
             `
-        INSERT INTO buckets (title, description, ammount, user_id)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO buckets (title, description, ammount, user_id, tags, date, period, bucket_type_id, linked_income_id)
+        VALUES ($1, $2, $3, $4, $5,$6,$7, $8, $9)
         RETURNING *;
     `,
-            [bucket.title, bucket.description, bucket.ammount, userId]
+            [bucket.title, bucket.description, bucket.ammount, userId, bucket.tags, bucket.date, bucket.period, bucketTypeId, bucket.linkedIncome]
         )
         const newBucket = res.pop()
-        console.log('===>', newBucket);
-        return bucketFactory.createFromDb({dbBucketData: newBucket, bucketType: {} as any});
+        return bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: {} as any });
     }
 
-    async read(id: number): Promise<IBucket> {
+    async read(id: number, userId: number): Promise<IBucket> {
         const res = await this.manager().query(
             `
         SELECT * 
         FROM buckets
+        WHERE id = $1 AND user_id = $2
+    `,
+            [id, userId]
+        )
+
+        const newBucket = res.pop()
+        const typeData = await this.getBucketTypeById(newBucket.bucket_type_id)
+
+        if (newBucket) {
+            const test = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: typeData });
+            return test;
+        }
+        return null;
+    }
+
+    async getBucketTypeById(id: number) {
+        const res = await this.manager().query(`
+        SELECT * 
+        FROM bucket_types
         WHERE id = $1
     `,
             [id]
         )
-
         if (res.length) {
-            return bucketFactory.createFromDb(res.pop());
+            return res.pop();
         }
         return null;
     }
@@ -62,29 +80,37 @@ export class BucketRepository {
         )
     }
 
-    async update(id: number, bucket: IBucket): Promise<IBucket> {
+    async update(bucket: IBucket): Promise<IBucket> {
+        const bucketTypeId = typeof bucket.bucketType === 'number' ? bucket.bucketType : bucket.bucketType.id;
         const res = await this.manager().query(
             `
         UPDATE buckets
-        SET title=$1, defaultCurrency=$2
+        SET title=$2, description=$3, ammount=$4, tags=$5, date=$6, period=$7, bucket_type_id=$8
         WHERE id=$1
+        RETURNING *;
     `,
-            [id, bucket.title, bucket.description]
-        )
-        if (res.length) {
-            return bucketFactory.createFromDb(res.pop());
+            [bucket.id, bucket.title, bucket.description, bucket.ammount, bucket.tags, bucket.date, bucket.period, bucketTypeId]
+        );
+
+        // res after db res [ [{}], 1 ] this question needs to be investigated
+        const newBucket = res[0].pop();
+        const bucketType = await this.getBucketTypeById(newBucket.bucket_type_id);
+        if (newBucket) {
+            const test = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType });
+            console.log('test',test);
+            return test;
         }
         return null;
     }
 
-    async delete(id: number): Promise<void> {
+    async delete(id: number, userId: number): Promise<void> {
         return await this.manager().query(
             `
         DELETE 
         FROM buckets
-        WHERE id = $1
+        WHERE id = $1 AND user_id = $2;
     `,
-            [id]
+            [id, userId]
         )
     }
 

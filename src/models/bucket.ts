@@ -41,7 +41,7 @@ export class Bucket {
   @Column({ type: "date", nullable: true })
   date: Date;
 
-  @Column({ type: "enum", enum: PeriodType, default: PeriodType.once })
+  @Column({ type: "enum", nullable: true, enum: PeriodType, default: PeriodType.once })
   period: PeriodType;
 
   @CreateDateColumn()

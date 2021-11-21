@@ -77,5 +77,7 @@ export class Bucket implements IBucket{
         this.description = bucket?.description || this.description;
         this.currency = bucket.currency || this.currency;
         this.bucketType = bucket.bucketType || this.bucketType;
+        this.date = bucket.date || this.date;
+        this.period = bucket.period || this.period;
     }
 }

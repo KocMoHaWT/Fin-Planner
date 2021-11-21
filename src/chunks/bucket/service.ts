@@ -24,22 +24,24 @@ export class BucketService implements IBucketService {
     async create(req: CustomRequest, res: Response): Promise<Response> {
         const data = new Bucket(req.body)
         const newBucket =  await this.repository.create(data.toJSON(), req.user.id);
-        console.log('id', newBucket);
         return res.status(200).json({ bucket: newBucket.toJSON()});
     }
 
     async update(req: CustomRequest, res: Response): Promise<Response> {
-        const bucket = new Bucket(req.body)
-        return res.status(200).json({...bucket});
+        const oldBucket = await this.repository.read(+req.params.id, req.user.id);
+        oldBucket.set(req.body);
+        const newBucket = await this.repository.update(oldBucket);
+        return res.status(200).json({...newBucket});
     }
 
     async delete(req: CustomRequest, res: Response): Promise<void> {
-        await this.repository.delete(+req.params.id);
+        console.log('req',req.params.id);
+        await this.repository.delete(+req.params.id, req.user.id);
         return res.status(200).end();
     }
 
     async read(req: CustomRequest, res: Response): Promise<Response>  {
-        const bucket = await this.repository.read(+req.params.id);
+        const bucket = await this.repository.read(+req.params.id, req.user.id);
         return res.status(200).json({...bucket});
     }
 
