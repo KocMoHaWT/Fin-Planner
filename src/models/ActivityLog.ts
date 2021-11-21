@@ -18,20 +18,23 @@ import { Income } from "./income";
 import { User } from "./user";
 import { UserAuth } from "./usersAuth";
   
-  @Entity("activityLogs")
+  @Entity("activity_logs")
   export class Bucket {
     @PrimaryColumn()
     id: number;
 
     @OneToOne(() => Bucket)
-    @JoinColumn()
+    @JoinColumn({ name: 'bucket_id'})
     bucket: Bucket;
 
     @Column({ type: "numeric", nullable: false })
     sum: number;
 
     @OneToOne(() => Income)
-    @JoinColumn()
+    @JoinColumn({ name: 'income_id'})
     income: Income;
+
+    @CreateDateColumn({ name: 'created_at'})
+    createdAt: Date;
   }
   

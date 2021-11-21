@@ -29,7 +29,7 @@ import { UserAuth } from "./usersAuth";
     @Column({ type: "varchar",  nullable: true  })
     password: string;
   
-    @CreateDateColumn()
+    @CreateDateColumn({ name: 'created_at'})
     createdAt: Date;
   
     @UpdateDateColumn()
