@@ -21,22 +21,24 @@ export class IncomeService implements IIncomeService {
 
     async create(req: CustomRequest, res: Response): Promise<Response> {
         const data = new Income(req.body)
-        const newIncome =  await this.repository.create(data.toJSON());
-        return res.status(200).json({ income: newIncome.toJSON()});
+        const newIncome =  await this.repository.create(data.toJSON(), req.user.id);
+        return res.status(200).json({ income: newIncome});
     }
 
     async update(req: CustomRequest, res: Response): Promise<Response> {
-        const income = new Income(req.body)
-        return res.status(200).json({...income});
+        const oldIncome = await this.repository.read(+req.params.id, req.user.id);
+        oldIncome.set(req.body);
+        const newBucket = await this.repository.update(oldIncome);
+        return res.status(200).json({...newBucket});
     }
 
     async delete(req: CustomRequest, res: Response): Promise<void> {
-        await this.repository.delete(+req.params.id);
+        await this.repository.delete(+req.params.id, req.user.id);
         return res.status(200).end();
     }
 
     async read(req: CustomRequest, res: Response): Promise<Response>  {
-        const income = await this.repository.read(+req.params.id);
+        const income = await this.repository.read(+req.params.id, req.user.id);
         return res.status(200).json({...income});
     }
 

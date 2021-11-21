@@ -1,12 +1,3 @@
-interface IIncomeType {
-    title: string;
-    minCheck: number;
-    maxCheck: number;
-    leftOver: number;
-    regular: boolean;
-    planned: boolean; /// need to think of how handle date
-}
-
 export enum Status {
     done = 'done',
     inProgress = 'inProgress',
@@ -16,54 +7,49 @@ export enum Status {
 export interface IIncome {
     id: number;
     title: string;
-    description: string;
-    check: number;
+    ammount: number;
     currency: string; // change to interface
-    incomeType: IIncomeType;
     userId: number;
-    status: Status;
+    date: Date;
+    regular: boolean;
 }
 
-export class Income {
-    private _id: number;
-    private _title: string;
-    private _description: string;
-    private _check: number
-    private _currency: string;
-    private _incomeType: IIncomeType;
-    private _userId: number;
-    private _status: Status;
+export class Income implements IIncome {
+    id: number;
+    title: string;
+    ammount: number;
+    currency: string;
+    userId: number;
+    date:Date;
+    regular: boolean;
 
-    constructor({ id, title, description, check, currency, incomeType, userId, status }: IIncome) {
-        this._id = id;
-        this._title = title;
-        this._check = check;
-        this._description = description;
-        this._currency = currency;
-        this._incomeType = incomeType;
-        this._userId = userId;
-        this._status = status;
+    constructor({ id, title, date, ammount, currency, userId, regular }: IIncome) {
+        this.id = id;
+        this.title = title;
+        this.ammount = +ammount;
+        this.date = date;
+        this.currency = currency;
+        this.userId = userId;
+        this.regular = regular
     }
-
-
+  
     toJSON(): IIncome {
         return {
-            id: this._id,
-            title: this._title,
-            check: this._check,
-            description: this._description,
-            currency: this._currency,
-            incomeType: this._incomeType,
-            userId: this._userId,
-            status: this._status
+            id: this.id,
+            title: this.title,
+            ammount: this.ammount,
+            date: this.date,
+            currency: this.currency,
+            userId: this.userId,
+            regular: this.regular
         }
     }
 
     set(income: Partial<IIncome>) {
-        this._title = income?.title || this._title;
-        this._check = income?.check || this._check;
-        this._description = income?.description || this._description;
-        this._currency = income.currency || this._currency;
-        this._incomeType = income.incomeType || this._incomeType;
+        this.title = income?.title || this.title;
+        this.ammount = income?.ammount || this.ammount;
+        this.date = income?.date || this.date;
+        this.currency = income.currency || this.currency;
+        this.regular = income.regular || this.regular;
     }
 }

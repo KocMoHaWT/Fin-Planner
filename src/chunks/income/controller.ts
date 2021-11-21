@@ -31,6 +31,7 @@ export class IncomeController implements IIncomeController {
     }
 
     async read(req: CustomRequest, res: Response) {
+        console.log('res');
         return this.service.read(req, res);
     }
 

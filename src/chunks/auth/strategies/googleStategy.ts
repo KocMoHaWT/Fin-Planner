@@ -39,8 +39,8 @@ export default class GoogleStrategy implements IAuthentication {
                 return newUser;
             }
             return user;
-        } catch(e) {
-
+        } catch (e) {
+            console.log(e);
             throw new Error(e);
         }
     }

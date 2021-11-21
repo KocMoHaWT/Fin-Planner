@@ -26,7 +26,7 @@ export class IncomeRouter extends CommonRoutesConfig {
         this.router.get('/:id', [this.incomeController.read.bind(this.incomeController)]);
         this.router.post('/', [this.incomeController.create.bind(this.incomeController)]);
         this.router.post('/update/:id', [this.incomeController.update.bind(this.incomeController)]);
-        this.router.delete('/:id', [this.incomeController.update.bind(this.incomeController)]);
+        this.router.delete('/:id', [this.incomeController.delete.bind(this.incomeController)]);
         this.router.get('/:offset/:limit', [this.incomeController.read.bind(this.incomeController)]);
         return this.router;
     }

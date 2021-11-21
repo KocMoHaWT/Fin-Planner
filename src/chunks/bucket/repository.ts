@@ -97,7 +97,6 @@ export class BucketRepository {
         const bucketType = await this.getBucketTypeById(newBucket.bucket_type_id);
         if (newBucket) {
             const test = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType });
-            console.log('test',test);
             return test;
         }
         return null;
