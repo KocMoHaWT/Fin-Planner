@@ -1,40 +1,57 @@
 import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    BeforeInsert,
-    CreateDateColumn,
-    UpdateDateColumn,
-    DeleteDateColumn,
-    OneToOne,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    ManyToMany,
-  } from "typeorm";
-import { BucketType } from "./bucketType";
-import { Currency } from "./currency";
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  OneToOne,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
+import { MovementDirection } from "../interfaces/moneyMovementDirection";
+import { Bucket } from "./bucket";
 import { Income } from "./income";
-import { User } from "./user";
-import { UserAuth } from "./usersAuth";
-  
-  @Entity("activity_logs")
-  export class Bucket {
-    @PrimaryColumn()
-    id: number;
 
-    @OneToOne(() => Bucket)
-    @JoinColumn({ name: 'bucket_id'})
-    bucket: Bucket;
+@Entity("activity_logs")
+export class ActivityLog {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: "numeric", nullable: false })
-    sum: number;
+  @Column({ type: "numeric", nullable: false })
+  ammount: number;
 
-    @OneToOne(() => Income)
-    @JoinColumn({ name: 'income_id'})
-    income: Income;
+  @Column({ type: "enum", nullable: false, enum: MovementDirection })
+  direction: MovementDirection;
 
-    @CreateDateColumn({ name: 'created_at'})
-    createdAt: Date;
-  }
-  
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @ManyToMany(() => Income)
+  @JoinTable({
+    name: 'income_logs',
+    joinColumn: {
+      name: "activity_log",
+      referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+      name: "income_id",
+      referencedColumnName: "id"
+    }
+  })
+  income_logs: Income[];
+
+  @ManyToMany(() => Bucket)
+  @JoinTable({
+    name: 'bucket_logs',
+    joinColumn: {
+      name: "activity_log",
+      referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+      name: "bucket_id",
+      referencedColumnName: "id"
+    }
+  })
+  bucket_logs: Bucket[];
+}

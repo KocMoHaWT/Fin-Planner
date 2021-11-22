@@ -24,11 +24,14 @@ export class BucketRouter extends CommonRoutesConfig {
 
     configureRoutes() {
         this.router.post('/', [this.authService.middleware.bind(this.authService), this.bucketController.create.bind(this.bucketController)]);
-        this.router.post('/update/:id', [this.authService.middleware.bind(this.authService), this.bucketController.update.bind(this.bucketController)]);
         this.router.get('/types/', [this.authService.middleware.bind(this.authService), this.bucketController.getBucketTypeList.bind(this.bucketController)]);
         this.router.delete('/:id', [this.authService.middleware.bind(this.authService), this.bucketController.delete.bind(this.bucketController)]);
+        this.router.post('/transfer', [this.authService.middleware.bind(this.authService), this.bucketController.moneyTransfer.bind(this.bucketController)]);
+        this.router.delete('/transfer/:id', [this.authService.middleware.bind(this.authService), this.bucketController.getLogs.bind(this.bucketController)]);
         this.router.get('/:id', [this.authService.middleware.bind(this.authService), this.bucketController.read.bind(this.bucketController)]);
+        this.router.get('/:id/logs', [this.authService.middleware.bind(this.authService), this.bucketController.getLogs.bind(this.bucketController)]);
         this.router.get('/:offset/:limit', [this.authService.middleware.bind(this.authService), this.bucketController.read.bind(this.bucketController)]);
+        this.router.post('/update/:id', [this.authService.middleware.bind(this.authService), this.bucketController.update.bind(this.bucketController)]);
         return this.router;
     }
 }

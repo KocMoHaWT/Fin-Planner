@@ -10,6 +10,8 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  JoinTable,
+  ManyToMany,
 } from "typeorm";
 import { Status } from "../chunks/bucket/bucket";
 import { BucketType } from "./bucketType";
@@ -22,6 +24,9 @@ import { PeriodType } from "../interfaces/periodType";
 export class Bucket {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: "numeric", nullable: true })
+  parent_id: string;
 
   @Column({ type: "varchar", length: 200, nullable: false })
   title: string;
@@ -53,9 +58,9 @@ export class Bucket {
   @DeleteDateColumn()
   deleteAt: Date;
 
-  @OneToOne(() => Income, { nullable: true })
-  @JoinColumn({ name: 'linked_income_id' })
-  linked_income: Income;
+  @ManyToMany(() => Income)
+  @JoinTable({ name: 'linked_incomes' })
+  linked_income: Income[];
 
   @OneToOne(() => Currency, { nullable: true })
   @JoinColumn({ name: 'currency_id' })

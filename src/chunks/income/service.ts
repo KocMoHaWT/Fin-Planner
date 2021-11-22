@@ -46,6 +46,11 @@ export class IncomeService implements IIncomeService {
         const incomes = await this.repository.getList(+req.params.offset, +req.params.limit, req.user.id);
         return res.status(200).json(incomes);
     }
+
+    async getLogs(req: CustomRequest, res: Response): Promise<Response>  {
+        const logs = await this.repository.getLogsByIncometId(+req.params.id, req.user.id);
+        return res.status(200).json(logs);
+    }
 }
 
 const init = new Promise(() => {

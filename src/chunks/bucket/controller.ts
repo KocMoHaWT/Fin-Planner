@@ -10,6 +10,8 @@ export interface IBucketController {
     update: (req: Request, res: Response) => Promise<any>;
     create: (req: Request, res: Response) => Promise<any>;
     getBucketTypeList: (req: Request, res: Response) => Promise<any>;
+    getLogs: (req: CustomRequest, res: Response)  => Promise<any>;
+    moneyTransfer: (req: CustomRequest, res: Response) => Promise<Response>
 }
 
 export class BucketController implements IBucketController {
@@ -42,6 +44,14 @@ export class BucketController implements IBucketController {
     async getBucketTypeList(req: CustomRequest, res: Response) {
         console.log('qew',this.service);
         return this.service.getBucketTypeList(req, res);
+    }
+
+    async getLogs(req: CustomRequest, res: Response):Promise<any> {
+        return this.service.getLogs(req, res);
+    }
+
+    async moneyTransfer(req: CustomRequest, res: Response):Promise<any> {
+        return this.service.moneyTransfer(req, res);
     }
 }
 

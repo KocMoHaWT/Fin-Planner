@@ -20,6 +20,7 @@ export interface IBucket {
     date?: Date;
     linkedIncome?: number;
     tags?: string;
+    logs?: any[];
 }
 
 
@@ -36,8 +37,9 @@ export class Bucket implements IBucket{
     date?: Date;
     linkedIncome?: number;
     tags?: string;
+    logs?: any[];
 
-    constructor({ id, title, description, tags, ammount, currency, bucketType, userId, status, period, date, linkedIncome }: IBucket) {
+    constructor({ id, title, description, tags, ammount, currency, bucketType, userId, status, period, date, linkedIncome, logs }: IBucket) {
         this.id = id;
         this.title = title;
         this.ammount = ammount;
@@ -49,7 +51,8 @@ export class Bucket implements IBucket{
         this.period = period;
         this.date = date;
         this.linkedIncome = linkedIncome;
-        this.tags = tags
+        this.tags = tags;
+        this.logs = logs;
     }
 
 
