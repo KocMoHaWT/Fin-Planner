@@ -95,20 +95,6 @@ export class IncomeRepository {
             [id, userId]
         )
     }
-
-
-    /// activity logs 
-    async getLogsByIncometId(incomeId: number, userId: number): Promise<any []> {
-        const res = await this.manager().query(
-            `
-        SELECT * FROM activity_logs 
-        WHERE user_id = $2 AND income_id = $1
-    `,
-            [incomeId, userId]
-        )
-
-        return res;
-    }
 }
 
 

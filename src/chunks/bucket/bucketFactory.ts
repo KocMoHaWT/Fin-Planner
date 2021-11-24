@@ -1,10 +1,9 @@
 import { IBucketType } from "../../interfaces/bucketType";
 import { PeriodType } from "../../interfaces/periodType";
-import { BucketType } from "../../models/bucketType";
 import { Income } from "../income/income";
 import { Bucket, IBucket, Status } from "./bucket";
 
-interface bucketData {
+export interface BucketData {
     id: number;
     title: string;
     description: string;
@@ -20,7 +19,7 @@ interface bucketData {
 
 class BucketFactory {
 
-    createFromDb({ dbBucketData, bucketType, logs = [] }: { dbBucketData: bucketData, bucketType: BucketType, logs?: any[] }): IBucket {
+    createFromDb({ dbBucketData, bucketType, logs = [] }: { dbBucketData: BucketData, bucketType: IBucketType, logs?: any[] }): Bucket {
         // validate data
         const { linked_income_id: linkedIncome = null, user_id: userId, ...bucketData } = dbBucketData;
         const newBucket = {

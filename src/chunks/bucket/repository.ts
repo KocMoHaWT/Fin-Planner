@@ -3,17 +3,17 @@ import InjectableContainer from "../../application/InjectableContainer";
 import { IBucketType } from "../../interfaces/bucketType";
 import { MovementDirection } from "../../interfaces/moneyMovementDirection";
 import { Bucket, IBucket } from "./bucket";
-import bucketFactory from "./bucketFactory";
+import bucketFactory, { BucketData } from "./bucketFactory";
 
 export interface IBucketRepository {
-    create: (body: IBucket, userId: number) => Promise<Bucket>;
-    update: (bucket: IBucket) => Promise<Response>;
-    read: (id: number, userId: number) => Promise<Bucket>;
+    create: (body: IBucket, userId: number) => Promise<BucketData>;
+    update: (bucket: IBucket) => Promise<BucketData>;
+    read: (id: number, userId: number) => Promise<BucketData>;
     getList: (skip: number, limit: number) => Promise<IBucket[]>;
     delete: (id: number, userId: number) => Promise<void>;
     getBucketTypeList: (skip: number, limit: number) => Promise<IBucketType[]>;
     createActivityLog: (bucketId: number, incomeId: number, ammount: number, direction: MovementDirection) => Promise<void>
-    getLogsByBucketId: (id: number, userId: number) => Promise<any[]>;
+    getBucketTypeById: (id: number) => Promise<IBucketType>;
 }
 
 export class BucketRepository {
@@ -34,7 +34,7 @@ export class BucketRepository {
             [bucket.title, bucket.description, bucket.ammount, userId, bucket.tags, bucket.date, bucket.period, bucketTypeId, bucket.linkedIncome]
         )
         const newBucket = res.pop()
-        return bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: {} as any });
+        return newBucket;
     }
 
     async read(id: number, userId: number): Promise<IBucket> {
@@ -48,11 +48,9 @@ export class BucketRepository {
         )
 
         const newBucket = res.pop()
-        const typeData = await this.getBucketTypeById(newBucket?.bucket_type_id)
-        const logs = await this.getLogsByBucketId(newBucket.id);
+       
         if (newBucket) {
-            const test = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: typeData, logs });
-            return test;
+            return newBucket;
         }
         return null;
     }
@@ -83,7 +81,7 @@ export class BucketRepository {
         )
     }
 
-    async update(bucket: IBucket): Promise<IBucket> {
+    async update(bucket: IBucket): Promise<BucketData> {
         const bucketTypeId = typeof bucket.bucketType === 'number' ? bucket.bucketType : bucket.bucketType.id;
         const res = await this.manager().query(
             `
@@ -97,11 +95,8 @@ export class BucketRepository {
 
         // res after db res [ [{}], 1 ] this question needs to be investigated
         const newBucket = res[0].pop();
-        const bucketType = await this.getBucketTypeById(newBucket?.bucket_type_id);
-        const logs = await this.getLogsByBucketId(newBucket.id);
         if (newBucket) {
-            const test = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType, logs });
-            return test;
+            return newBucket;
         }
         return null;
     }
@@ -126,31 +121,7 @@ export class BucketRepository {
     `,
             [limit, skip]
         )
-    }
-
-
-    /// activityLog 
-    async createActivityLog(bucketId: number, incomeId: number, ammount: number, direction: MovementDirection): Promise<void> {
-        await this.manager().query(
-            `
-                INSERT INTO activity_logs (ammount, direction, bucket_log_id, income_log_id)
-                VALUES ($1, $2, $3, $4);
-            `, [ammount, direction, bucketId, incomeId]
-        )
-    }
-
-    async getLogsByBucketId(bucketId: number): Promise<any[]> {
-        const res = await this.manager().query(
-            `
-        SELECT bucket_log_id, income_log_id, ammount, direction  FROM activity_logs
-        WHERE bucket_log_id = $1;
-    `,
-            [bucketId]
-        )
-
-        console.log('res', res);
-        return res;
-    }    
+    } 
 }
 
 

@@ -2,7 +2,7 @@ export interface IBucketType {
     id: number;
     title: string;
     strict?: boolean;
-    planning?: boolean;
+    planned?: boolean;
     regular?: boolean;
     leftover?: boolean;
 }
