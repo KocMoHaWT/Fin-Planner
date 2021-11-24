@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
+  ManyToOne,
 } from "typeorm";
 import { MovementDirection } from "../interfaces/moneyMovementDirection";
 import { Bucket } from "./bucket";
@@ -27,31 +28,11 @@ export class ActivityLog {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToMany(() => Income)
-  @JoinTable({
-    name: 'income_logs',
-    joinColumn: {
-      name: "activity_log",
-      referencedColumnName: "id"
-    },
-    inverseJoinColumn: {
-      name: "income_id",
-      referencedColumnName: "id"
-    }
-  })
-  income_logs: Income[];
+  @ManyToOne(() => Income)
+  @JoinColumn({ name: 'income_log_id'})
+  income_logs_id: Income;
 
-  @ManyToMany(() => Bucket)
-  @JoinTable({
-    name: 'bucket_logs',
-    joinColumn: {
-      name: "activity_log",
-      referencedColumnName: "id"
-    },
-    inverseJoinColumn: {
-      name: "bucket_id",
-      referencedColumnName: "id"
-    }
-  })
-  bucket_logs: Bucket[];
+  @ManyToOne(() => Bucket)
+  @JoinColumn({ name: 'bucket_log_id'})
+  bucket_log_id: Bucket;
 }

@@ -88,11 +88,11 @@ export class BucketRepository {
         const res = await this.manager().query(
             `
         UPDATE buckets
-        SET title=$2, description=$3, ammount=$4, tags=$5, date=$6, period=$7, bucket_type_id=$8
+        SET title=$2, description=$3, ammount=$4, tags=$5, date=$6, period=$7, bucket_type_id=$8, status=$9
         WHERE id=$1
         RETURNING *;
     `,
-            [bucket.id, bucket.title, bucket.description, bucket.ammount, bucket.tags, bucket.date, bucket.period, bucketTypeId]
+            [bucket.id, bucket.title, bucket.description, bucket.ammount, bucket.tags, bucket.date, bucket.period, bucketTypeId, bucket.status]
         );
 
         // res after db res [ [{}], 1 ] this question needs to be investigated
@@ -131,50 +131,26 @@ export class BucketRepository {
 
     /// activityLog 
     async createActivityLog(bucketId: number, incomeId: number, ammount: number, direction: MovementDirection): Promise<void> {
-        await this.manager().transaction(async manager => {
-            const res = await manager.query(
-                `
-            INSERT INTO activity_logs (ammount, direction)
-            VALUES ($1, $2)
-            RETURNING *;
-        `,
-                [ammount, direction]
-            )
-
-            await manager.query(
-                `
-            INSERT INTO bucket_logs (bucket_id, activity_log)
-            VALUES ($1, $2);
-        `,
-                [bucketId, res[0].id]
-            )
-            await manager.query(
-                `
-            INSERT INTO income_logs (income_id,activity_log)
-            VALUES ($1, $2);
-        `,
-                [incomeId, res[0].id]
-            )
-        })
+        await this.manager().query(
+            `
+                INSERT INTO activity_logs (ammount, direction, bucket_log_id, income_log_id)
+                VALUES ($1, $2, $3, $4);
+            `, [ammount, direction, bucketId, incomeId]
+        )
     }
 
     async getLogsByBucketId(bucketId: number): Promise<any[]> {
         const res = await this.manager().query(
             `
-        SELECT bucket_id, income_id, ammount, direction  FROM activity_logs
-        LEFT JOIN bucket_logs 
-        ON bucket_logs.activity_log = activity_logs.id
-        LEFT JOIN income_logs 
-        ON income_logs.activity_log = activity_logs.id
-        WHERE bucket_id = $1
+        SELECT bucket_log_id, income_log_id, ammount, direction  FROM activity_logs
+        WHERE bucket_log_id = $1;
     `,
             [bucketId]
         )
 
         console.log('res', res);
         return res;
-    }
-
+    }    
 }
 
 

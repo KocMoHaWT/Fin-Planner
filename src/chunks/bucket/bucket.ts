@@ -82,5 +82,6 @@ export class Bucket implements IBucket{
         this.bucketType = bucket.bucketType || this.bucketType;
         this.date = bucket.date || this.date;
         this.period = bucket.period || this.period;
+        this.status = bucket.status || this.status;
     }
 }

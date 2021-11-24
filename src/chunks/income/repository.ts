@@ -107,7 +107,6 @@ export class IncomeRepository {
             [incomeId, userId]
         )
 
-        console.log('res',res);
         return res;
     }
 }
