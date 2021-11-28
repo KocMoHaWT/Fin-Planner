@@ -27,11 +27,11 @@ export class BucketRepository {
         const bucketTypeId = typeof bucket.bucketType === 'number' ? bucket.bucketType : bucket.bucketType.id;
         const res = await this.manager().query(
             `
-        INSERT INTO buckets (title, description, ammount, user_id, tags, date, period, bucket_type_id, linked_income_id)
-        VALUES ($1, $2, $3, $4, $5,$6,$7, $8, $9)
+        INSERT INTO buckets (title, description, ammount, user_id, tags, date, period, bucket_type_id, linked_income_id, currency)
+        VALUES ($1, $2, $3, $4, $5,$6,$7, $8, $9, $10)
         RETURNING *;
     `,
-            [bucket.title, bucket.description, bucket.ammount, userId, bucket.tags, bucket.date, bucket.period, bucketTypeId, bucket.linkedIncome]
+            [bucket.title, bucket.description, bucket.ammount, userId, bucket.tags, bucket.date, bucket.period, bucketTypeId, bucket?.linkedIncome, bucket.currency]
         )
         const newBucket = res.pop()
         return newBucket;

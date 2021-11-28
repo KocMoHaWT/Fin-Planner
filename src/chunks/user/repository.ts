@@ -89,7 +89,12 @@ export class UserRepository implements IUserRepository {
     async findById(id: number): Promise<User> {
         const res = await this.manager().query(
             `
-        SELECT * FROM users WHERE id=$1;
+        SELECT users.id, name, email, 
+        currency_name as "currencyName", currency_key as "currencyKey" 
+        FROM users 
+        LEFT JOIN currencies
+        ON users.default_currency = currencies.currency_key
+        WHERE users.id=$1;
     `,
             [id]
         )

@@ -46,6 +46,9 @@ export class Bucket {
   @Column({ type: "date", nullable: true })
   date: Date;
 
+  @Column({ type: "varchar",  nullable: true, name: 'currency'  })
+  default_currency: Currency;
+
   @Column({ type: "enum", nullable: true, enum: PeriodType, default: PeriodType.once })
   period: PeriodType;
 
@@ -58,19 +61,15 @@ export class Bucket {
   @DeleteDateColumn()
   deleteAt: Date;
 
-  @ManyToMany(() => Income)
-  @JoinTable({ name: 'linked_incomes' })
-  linked_income: Income[];
-
-  @OneToOne(() => Currency, { nullable: true })
-  @JoinColumn({ name: 'currency_id' })
-  currency: Currency;
+  @ManyToOne(() => Income, { nullable: true})
+  @JoinColumn({ name: 'linked_income_id' })
+  linked_income: Income;
 
   @ManyToOne(() => User, user => user.buckets)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => BucketType, bucket_type => bucket_type.id, { nullable: true })
+  @ManyToOne(() => BucketType, bucket_type => bucket_type.id)
   @JoinColumn({ name: 'bucket_type_id' })
   bucket_type: BucketType;
 }

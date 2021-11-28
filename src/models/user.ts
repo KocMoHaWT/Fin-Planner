@@ -42,8 +42,7 @@ import { UserAuth } from "./usersAuth";
     @JoinColumn()
     authentication: UserAuth;
 
-    @OneToOne(() => Currency)
-    @JoinColumn()
+    @Column({ type: "varchar",  nullable: true, name: 'default_currency'  })
     default_currency: Currency;
     
     @OneToMany(() => Bucket, bucket => bucket.user)

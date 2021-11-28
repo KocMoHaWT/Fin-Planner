@@ -9,6 +9,7 @@ export interface BucketData {
     description: string;
     ammount: number;
     currency: string;
+    bucket_type_id: number;
     user_id: number;
     date: Date;
     status: Status;
@@ -24,7 +25,7 @@ class BucketFactory {
         const { linked_income_id: linkedIncome = null, user_id: userId, ...bucketData } = dbBucketData;
         const newBucket = {
             ...bucketData,
-            bucketType: bucketType,
+            bucketType: bucketType || bucketData.bucket_type_id,
             userId,
             linkedIncome,
             logs

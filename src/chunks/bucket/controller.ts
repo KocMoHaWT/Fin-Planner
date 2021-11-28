@@ -42,7 +42,6 @@ export class BucketController implements IBucketController {
     }
 
     async getBucketTypeList(req: CustomRequest, res: Response) {
-        console.log('qew',this.service);
         return this.service.getBucketTypeList(req, res);
     }
 

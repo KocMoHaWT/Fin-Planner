@@ -13,7 +13,6 @@ export default class AuthenticationData {
 
     constructor({ email, password, name }: IAuthData) {
         if (!this.validateEmail(email) || !this.validatePassword(password)) {
-            console.log('new ');
             throw new Error('not valid');
         }
         this.email = email;

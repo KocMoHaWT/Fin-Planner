@@ -62,7 +62,6 @@ export class AuthService implements IAuthService {
             }
             const tokens = await jwtFactory.createTokenPair(user.id);
             await this.repository.saveRefreshToken(tokens.refreshToken, user.id);
-            console.log('wa');
             return res.status(201).json({
                 ...tokens
             });

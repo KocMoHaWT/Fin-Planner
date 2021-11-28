@@ -22,6 +22,9 @@ export class Income {
   @Column({ type: "numeric", nullable: false })
   ammount: number;
 
+  @Column({ type: "numeric", default: 0 })
+  balance: number;
+
   @Column({ type: "date", nullable: true })
   date: Date;
 

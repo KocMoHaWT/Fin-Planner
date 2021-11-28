@@ -19,7 +19,6 @@ export default class GoogleStrategy implements IAuthentication {
     }
     async verify(token: string): Promise<User> {
         try {
-            console.log('ticket');
             const ticket = await this.client.verifyIdToken({
                 idToken: token,
                 audience: envs.googleId,  // Specify the CLIENT_ID of the app that accesses the backend

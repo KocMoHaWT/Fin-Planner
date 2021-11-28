@@ -63,7 +63,7 @@ export class AuthRepository implements IAuthRepository {
 
     async getUserByIdentity(identity: string, type: Identity): Promise<User | null> {
         const res = await this.manager().query(`
-            SELECT users.email, users.name, users.id
+            SELECT users.email, users.name, users.id, default_currency as "defaultCurrency"
             FROM usersauth
             RIGHT JOIN users
             ON usersauth.user_id = users.id

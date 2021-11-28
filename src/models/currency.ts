@@ -18,23 +18,10 @@ import { UserAuth } from "./usersAuth";
     @PrimaryGeneratedColumn()
     id: number;
   
-    @Column({ type: "varchar", length: 200, nullable: false })
+    @Column({ type: "varchar", length: 200, nullable: false, name: 'currency_name' })
     currencyName: string;
   
-    @Column({ type: "varchar", length: 10, nullable: false })
+    @Column({ type: "varchar", length: 10, nullable: false, name: 'currency_key'})
     currencyKey: false;
-
-  
-    // @OneToMany(() => Comment, comment => comment.user)
-    // @JoinColumn({ name: 'comments'})
-    // comments: Comment[];
-  
-    // @OneToMany(() => PostLikes, post => post.user)
-    // @JoinColumn()
-    // post: PostLikes[];
-  
-    // @ManyToOne(() => Role)
-    // @JoinColumn()
-    // role: Role;
   }
   

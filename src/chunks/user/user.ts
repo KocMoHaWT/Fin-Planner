@@ -4,7 +4,7 @@ export interface IUser {
     name: string;
     email: string;
     createdAt?: Date;
-    defaultCurrency?: any;
+    defaultCurrency?: string;
 }
 
 export default class User {
@@ -13,18 +13,22 @@ export default class User {
     private _email: string;
     private _createdAt: Date;
     // change
-    private _defaultCurrency: any;
+    private _defaultCurrency: string;
 
     constructor(User: IUser) {
         this._id = User?.id;
         this._name = User.name;
         this._email = User.email;
         this._createdAt = User.createdAt;
-        this._defaultCurrency = User.defaultCurrency;
+        this._defaultCurrency = User.defaultCurrency
     }
 
     get id() {
         return this._id;
+    }
+
+    get defaultCurrency() {
+        return this._defaultCurrency;
     }
 
     toJSON() {

@@ -1,4 +1,5 @@
 import { getManager } from "typeorm";
+import DefaultRepository from "../../application/DefaultRepository";
 import InjectableContainer from "../../application/InjectableContainer";
 import { IActivityLog } from "../../interfaces/activityLog";
 import { MovementDirection } from "../../interfaces/moneyMovementDirection";
@@ -16,8 +17,8 @@ export class ActivityLogRepository {
         this.manager = manager;
     }
 
-    async create(bucketId: number, incomeId: number, ammount: number, direction: MovementDirection): Promise<void> {
-        await this.manager().query(
+    async create(bucketId: number, incomeId: number, ammount: number, direction: MovementDirection, connection: any = null): Promise<void> {
+        await this.manager(connection).query(
             `
                 INSERT INTO activity_logs (ammount, direction, bucket_log_id, income_log_id)
                 VALUES ($1, $2, $3, $4);

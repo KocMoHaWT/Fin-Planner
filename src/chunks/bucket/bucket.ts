@@ -39,18 +39,18 @@ export class Bucket implements IBucket{
     tags?: string;
     logs?: any[];
 
-    constructor({ id, title, description, tags, ammount, currency, bucketType, userId, status, period, date, linkedIncome, logs }: IBucket) {
+    constructor({ id, title, description, tags, ammount, currency: currencyKey, bucketType, userId, status, period, date, linkedIncome, logs }: IBucket, userDefaultCurrency?: string) {
         this.id = id;
         this.title = title;
         this.ammount = ammount;
         this.description = description;
-        this.currency = currency;
+        this.currency = currencyKey || userDefaultCurrency;
         this.bucketType = bucketType;
         this.userId = userId;
         this.status = status;
         this.period = period;
         this.date = date;
-        this.linkedIncome = linkedIncome;
+        this.linkedIncome = linkedIncome || null;
         this.tags = tags;
         this.logs = logs;
     }

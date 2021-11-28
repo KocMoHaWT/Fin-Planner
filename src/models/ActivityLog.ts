@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { MovementDirection } from "../interfaces/moneyMovementDirection";
 import { Bucket } from "./bucket";
+import { Currency } from "./currency";
 import { Income } from "./income";
 
 @Entity("activity_logs")
@@ -28,11 +29,18 @@ export class ActivityLog {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @Column({ type: "float", nullable: true, name: 'currency_rate' })
+  currencyRate: number;
+
+  @ManyToOne(() => Currency)
+  @JoinColumn({ name: 'currency_id'})
+  currency_id: Currency;
+
   @ManyToOne(() => Income)
-  @JoinColumn({ name: 'income_log_id'})
+  @JoinColumn({ name: 'income_id'})
   income_logs_id: Income;
 
   @ManyToOne(() => Bucket)
-  @JoinColumn({ name: 'bucket_log_id'})
+  @JoinColumn({ name: 'bucket_id'})
   bucket_log_id: Bucket;
 }

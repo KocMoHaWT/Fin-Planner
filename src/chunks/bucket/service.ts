@@ -29,9 +29,9 @@ export class BucketService implements IBucketService {
     }
 
     async create(req: CustomRequest, res: Response): Promise<Response> {
-        const data = new Bucket(req.body)
+        const data = new Bucket(req.body, req.user?.defaultCurrency)
         const newBucket = await this.repository.create(data.toJSON(), req.user.id);
-        const bucket = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: {} as any })
+        const bucket = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: null })
         return res.status(200).json({ bucket: bucket.toJSON() });
     }
 
