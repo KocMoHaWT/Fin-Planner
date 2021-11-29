@@ -5,4 +5,7 @@ export interface IActivityLog {
     incomeId: number;
     ammount: number;
     direction: MovementDirection;
+    currencyValue: number;
+    start_currency: string;
+    end_currency: string;
 }

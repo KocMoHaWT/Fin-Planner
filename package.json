@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/KocMoHaWT/Fin-Planner#readme",
   "dependencies": {
+    "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",

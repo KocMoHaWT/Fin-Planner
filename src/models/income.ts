@@ -22,21 +22,17 @@ export class Income {
   @Column({ type: "numeric", nullable: false })
   ammount: number;
 
-  @Column({ type: "numeric", default: 0 })
-  balance: number;
-
   @Column({ type: "date", nullable: true })
   date: Date;
 
   @Column({ type: "enum", enum: PeriodType, nullable: true, default: PeriodType.once })
   period: PeriodType;
 
+  @Column({ type: "varchar",  nullable: true, name: 'currency'  })
+  default_currency: string;
+
   @Column({ type: "boolean", default: false })
   regular: boolean;
-
-  @OneToOne(() => Currency, { nullable: true})
-  @JoinColumn({ name: 'currency_id'})
-  currency: Currency;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id'})

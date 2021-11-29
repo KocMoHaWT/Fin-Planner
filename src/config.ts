@@ -17,4 +17,5 @@ export default {
   redisHost: process.env.redisHost,
   redisPassword: process.env.redisPass,
   redisPort: process.env.redisPort,
+  currencyApi: process.env.currencyApi,
 };

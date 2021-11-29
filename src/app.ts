@@ -7,6 +7,7 @@ import autInit from './chunks/auth';
 import userInit from './chunks/user';
 import bucketInit from './chunks/bucket';
 import incomeInit from './chunks/income';
+import currencyInit from './chunks/currency';
 import activityLogInit from './chunks/activityLogs';
 import * as cookieParser from 'cookie-parser';
 
@@ -26,7 +27,7 @@ const globalMiddleware: Array<RequestHandler> = [
 Promise.resolve()
     .then(() => server.initDatabase())
     .then(() => {
-       Promise.all([ ...userInit, ...autInit, ...bucketInit, ...incomeInit, ...activityLogInit])
+       Promise.all([ ...userInit, ...autInit, ...bucketInit, ...incomeInit, ...activityLogInit, ...currencyInit])
     })
     .then(() => {
         server.loadGlobalMiddleware(globalMiddleware);

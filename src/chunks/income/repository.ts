@@ -21,7 +21,7 @@ export class IncomeRepository {
     async create(income: IIncome, userId: number): Promise<IIncome> {
         const res = await this.manager().query(
             `
-        INSERT INTO incomes (title, ammount, currency_id, date, regular, user_id)
+        INSERT INTO incomes (title, ammount, currency, date, regular, user_id)
         VALUES ($1, $2, $3,$4,$5, $6)
         RETURNING *;
     `,

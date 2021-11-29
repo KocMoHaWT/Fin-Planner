@@ -29,12 +29,14 @@ export class ActivityLog {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @Column({ type: "float", nullable: true, name: 'currency_rate' })
-  currencyRate: number;
+  @Column({ type: "float", nullable: true, name: 'currency_value' })
+  currencyValue: number;
 
-  @ManyToOne(() => Currency)
-  @JoinColumn({ name: 'currency_id'})
-  currency_id: Currency;
+  @Column({ type: "varchar",  nullable: true, name: 'start_currency'  })
+  start_currency: string;
+
+  @Column({ type: "varchar",  nullable: true, name: 'end_currency'  })
+  end_currency: string;
 
   @ManyToOne(() => Income)
   @JoinColumn({ name: 'income_id'})

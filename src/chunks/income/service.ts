@@ -10,6 +10,7 @@ export interface IIncomeService {
     getList: (req: CustomRequest, res: Response) => Promise<Response>;
     read: (req: CustomRequest, res: Response) => Promise<Response>;
     delete: (req: CustomRequest, res: Response) => Promise<void>;
+    getIncome: (id: number, userId: number) => Promise<Income>;
 }
 
 export class IncomeService implements IIncomeService {
@@ -20,7 +21,7 @@ export class IncomeService implements IIncomeService {
     }
 
     async create(req: CustomRequest, res: Response): Promise<Response> {
-        const data = new Income(req.body)
+        const data = new Income(req.body, req.user.defaultCurrency);
         const newIncome =  await this.repository.create(data.toJSON(), req.user.id);
         return res.status(200).json({ income: newIncome});
     }
@@ -40,6 +41,10 @@ export class IncomeService implements IIncomeService {
     async read(req: CustomRequest, res: Response): Promise<Response>  {
         const income = await this.repository.read(+req.params.id, req.user.id);
         return res.status(200).json({...income});
+    }
+
+    async getIncome(id: number, userId: number): Promise<Income>  {
+        return this.repository.read(id, userId);
     }
 
     async getList(req: CustomRequest, res: Response): Promise<Response>  {

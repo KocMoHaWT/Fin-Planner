@@ -4,6 +4,7 @@ import envs from '../../../config';
 
 export interface IRedisRepository {
     set: (key: string, value: string | number) => Promise<void>;
+    expire: (key: string, value: string | number) => Promise<void>;
     get: (key: string) => Promise<string | number>;
 }
 
@@ -25,6 +26,10 @@ class RedisRepository implements IRedisRepository {
 
     async get(key: string) {
         return this.client.get(key)
+    }
+
+    async expire(key: string, value: string) {
+        return this.client.expire(key, value);
     }
 }
 

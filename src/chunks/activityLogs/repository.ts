@@ -5,7 +5,7 @@ import { IActivityLog } from "../../interfaces/activityLog";
 import { MovementDirection } from "../../interfaces/moneyMovementDirection";
 
 export interface IActivityLogRepository {
-    create: (bucketId: number, incomeId: number, ammount: number, direction: MovementDirection) => Promise<void>
+    create: (data: IActivityLog, connection?: any) => Promise<void>
     getLogsByBucketId: (id: number, userId: number) => Promise<IActivityLog[]>;
     getLogsByIncomeId: (id: number, userId: number) => Promise<IActivityLog[]>;
 }
@@ -17,36 +17,36 @@ export class ActivityLogRepository {
         this.manager = manager;
     }
 
-    async create(bucketId: number, incomeId: number, ammount: number, direction: MovementDirection, connection: any = null): Promise<void> {
+    async create({ bucketId, incomeId, ammount, direction, currencyValue, start_currency, end_currency }:IActivityLog, connection: any = undefined): Promise<void> {
         await this.manager(connection).query(
             `
-                INSERT INTO activity_logs (ammount, direction, bucket_log_id, income_log_id)
-                VALUES ($1, $2, $3, $4);
-            `, [ammount, direction, bucketId, incomeId]
+                INSERT INTO activity_logs (ammount, direction, bucket_id, income_id, currency_value, start_currency, end_currency)
+                VALUES ($1, $2, $3, $4, $5, $6, $7);
+            `, [ammount, direction, bucketId, incomeId, currencyValue, start_currency, end_currency]
         )
     }
 
     async getLogsByBucketId(bucketId: number): Promise<any[]> {
         const res = await this.manager().query(
             `
-        SELECT bucket_log_id, income_log_id, ammount, direction  FROM activity_logs
-        WHERE bucket_log_id = $1;
+        SELECT bucket_id, income_id, ammount, direction, start_currency as "starCurrency", end_currency as "endCurrency"  FROM activity_logs
+        WHERE bucket_id = $1;
     `,
             [bucketId]
         )
 
         console.log('res', res);
         return res;
-    }    
+    }
 
 
-    async getLogsByIncometId(incomeId: number, userId: number): Promise<any []> {
+    async getLogsByIncometId(incomeId: number, userId: number): Promise<any[]> {
         const res = await this.manager().query(
             `
         SELECT * FROM activity_logs 
-        WHERE user_id = $2 AND income_id = $1
+        WHERE income_id = $1
     `,
-            [incomeId, userId]
+            [incomeId]
         )
 
         return res;

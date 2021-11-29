@@ -4,7 +4,6 @@ export default class DefaultRepository {
     async getRunner() {
         const connection = getConnection();
         const queryRunner = await connection.createQueryRunner();
-        console.log('qew', queryRunner.connection);
         return queryRunner;
     }
 

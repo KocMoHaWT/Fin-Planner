@@ -23,12 +23,12 @@ export class Income implements IIncome {
     date:Date;
     regular: boolean;
 
-    constructor({ id, title, date, ammount, currency, userId, regular }: IIncome) {
+    constructor({ id, title, date, ammount, currency, userId, regular }: IIncome, defaultCurrency?: string) {
         this.id = id;
         this.title = title;
         this.ammount = +ammount;
         this.date = date;
-        this.currency = currency;
+        this.currency = currency || defaultCurrency;
         this.userId = userId;
         this.regular = regular
     }
