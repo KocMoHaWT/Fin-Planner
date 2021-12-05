@@ -27,7 +27,6 @@ export class CurrencyService implements ICurrencyService {
             await this.repository.set(start_currency + end_currency, alreadyExistedValue);
             await this.repository.expire(start_currency + end_currency, 1000 * 60 * 60 * 12);
         }
-
         return alreadyExistedValue;
     }
 }

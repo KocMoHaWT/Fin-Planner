@@ -27,13 +27,12 @@ export class ActivityLogService implements IActivityLogService {
 
     async createMoneyTransfer(data: IActivityLog, bucketCurrency: string, incomeCurrency: string): Promise<void> {
         const [start_currency, end_currency] = data.direction === MovementDirection.spent ? [incomeCurrency, bucketCurrency] : [bucketCurrency, incomeCurrency]
-        console.log(start_currency, end_currency);
         const currencyValue = await this.currencyService.getCurrenctCurrencyValue(start_currency, end_currency);
-        console.log('currencyValue',currencyValue);
         this.repository.create({...data, currencyValue, start_currency, end_currency });
     }
 
     async getIncomeLogs(id: number, userId: number): Promise<IActivityLog[]> {
+        console.log('qeqwqweqweqewqweewq', id, userId, this.repository);
         return this.repository.getLogsByIncomeId(id, userId);
     }
 }

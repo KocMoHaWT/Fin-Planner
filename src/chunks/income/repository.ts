@@ -8,7 +8,6 @@ export interface IIncomeRepository {
     read: (id: number, userId: number) => Promise<Income>;
     getList: (id: number, skip: number, limit: number, ) => Promise<IIncome[]>
     delete: (id: number, userId: number) => Promise<void>;
-    getLogsByIncometId: (incomeId: number, userId: number) => Promise<any []>;
 }
 
 export class IncomeRepository {
@@ -28,10 +27,9 @@ export class IncomeRepository {
             [income.title, income.ammount, income.currency, income.date, income.regular, userId]
         );
         const dbIncome = res.pop();
-
         if (dbIncome) {
-            const test = new Income(dbIncome);
-            return test;
+            const income = new Income(dbIncome);
+            return income;
         }
         return null;
     }

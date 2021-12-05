@@ -1,3 +1,6 @@
+import { IActivityLog } from "../../interfaces/activityLog";
+import { ActivityLog } from "../../models/activityLog";
+
 export enum Status {
     done = 'done',
     inProgress = 'inProgress',
@@ -12,6 +15,7 @@ export interface IIncome {
     userId: number;
     date: Date;
     regular: boolean;
+    logs?: IActivityLog[];
 }
 
 export class Income implements IIncome {
@@ -22,6 +26,7 @@ export class Income implements IIncome {
     userId: number;
     date:Date;
     regular: boolean;
+    logs?: IActivityLog[];
 
     constructor({ id, title, date, ammount, currency, userId, regular }: IIncome, defaultCurrency?: string) {
         this.id = id;
@@ -41,8 +46,13 @@ export class Income implements IIncome {
             date: this.date,
             currency: this.currency,
             userId: this.userId,
-            regular: this.regular
+            regular: this.regular,
+            logs: this.logs
         }
+    }
+
+    setLogs(logs: IActivityLog[]) {
+        this.logs = logs;
     }
 
     set(income: Partial<IIncome>) {

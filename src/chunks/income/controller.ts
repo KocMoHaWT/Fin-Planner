@@ -12,15 +12,15 @@ export interface IIncomeController {
 }
 
 export class IncomeController implements IIncomeController {
-  private service: IIncomeService;
+    private service: IIncomeService;
 
     constructor({ incomeService }: { incomeService: IIncomeService }) {
         this.service = incomeService;
     }
 
     async create(req: CustomRequest, res: Response) {
-        const newIncome = this.service.create(req.body, req.user);
-        return res.status(200).json({ income: newIncome});
+        const newIncome = await this.service.create(req.body, req.user);
+        return res.status(200).json({ ...newIncome });
     }
 
     async delete(req: CustomRequest, res: Response) {
@@ -29,18 +29,18 @@ export class IncomeController implements IIncomeController {
     }
 
     async getList(req: CustomRequest, res: Response) {
-        const incomes =  this.service.getList(req.user.id, +req.query.offset, +req.query.limit);
+        const incomes = this.service.getList(req.user.id, +req.query.offset, +req.query.limit);
         return res.status(200).json(incomes);
     }
 
     async read(req: CustomRequest, res: Response) {
-        const income =  this.service.read(+req.params.id, req.user.id);
-        return res.status(200).json({...income})
+        const income = await this.service.getIncome(+req.params.id, req.user.id);
+        return res.status(200).json({ ...income })
     }
 
     async update(req: CustomRequest, res: Response) {
         const newIncome = this.service.update(+req.params.id, req.user, req.body);
-        return res.status(200).json({...newIncome});
+        return res.status(200).json({ ...newIncome });
     }
 }
 

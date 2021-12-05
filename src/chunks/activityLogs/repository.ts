@@ -26,7 +26,7 @@ export class ActivityLogRepository {
         )
     }
 
-    async getLogsByBucketId(bucketId: number): Promise<any[]> {
+    async getLogsByBucketId(bucketId: number): Promise<IActivityLog[]> {
         const res = await this.manager().query(
             `
         SELECT bucket_id, income_id, ammount, direction, start_currency as "starCurrency", end_currency as "endCurrency"  FROM activity_logs
@@ -40,15 +40,15 @@ export class ActivityLogRepository {
     }
 
 
-    async getLogsByIncometId(incomeId: number, userId: number): Promise<any[]> {
+    async getLogsByIncomeId(incomeId: number): Promise<IActivityLog[]> {
         const res = await this.manager().query(
             `
         SELECT * FROM activity_logs 
-        WHERE income_id = $1
+        WHERE income_id = $1;
     `,
             [incomeId]
         )
-
+        console.log('res',res);
         return res;
     }
 }

@@ -32,7 +32,6 @@ export class IncomeRouter extends CommonRoutesConfig {
     }
 }
 
-
 const init = new Promise(() => {
     InjectableContainer.setDependency(IncomeRouter, 'incomeRouter', ['incomeController', 'authService']);
 });
