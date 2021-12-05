@@ -6,7 +6,7 @@ import User, { IUser } from "./user";
 
 export interface IUserRepository {
     create: (User: AuthData) => Promise<void>;
-    update: (User: User) => Promise<void>;
+    update: (User: User) => Promise<User>;
     isUserExists: (email: string) => Promise<User>;
     verifyUser: (email: string, password: string) => Promise<User>;
     findById: (id: number) => Promise<User>;
@@ -63,17 +63,21 @@ export class UserRepository implements IUserRepository {
         return null;
     }
 
-    async update(user: User): Promise<void> {
+    async update(user: User): Promise<User> {
         const simpleUser = user.toJSON();
         const res = await this.manager().query(
             `
         UPDATE users
         SET name=$1, default_currency=$2
         WHERE id=$1
+        RETURNING *;
     `,
             [simpleUser.name, simpleUser.defaultCurrency]
         )
-        return res;
+        if (res.length) {
+            return new User(res[0]);
+        }
+        return null;
     };
 
     async isUserExists(email: string): Promise<User> {

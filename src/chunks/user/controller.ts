@@ -16,11 +16,22 @@ export class UserController implements IUserController {
     }
 
     async read(req: CustomRequest, res: Response) {
-        return this.service.sendUserToFront(req, res);
+        try {
+            const user = this.service.sendUserToFront(req.user);
+            return res.status(200).json(user);
+        } catch (e) {
+            return res.status(406).json(e);
+        }
+     
     }
 
     async update(req: Request, res: Response) {
-        return this.service.updateUser(req, res);
+        try {
+            const updatedUser =  this.service.updateUser(req.user, req.body);
+            return res.status(200).json(updatedUser);
+        } catch (e) {
+            return res.status(406).json(e);
+        }
     }
 }
 
