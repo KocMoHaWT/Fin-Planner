@@ -25,7 +25,7 @@ export class UserController implements IUserController {
      
     }
 
-    async update(req: Request, res: Response) {
+    async update(req: CustomRequest, res: Response) {
         try {
             const updatedUser =  this.service.updateUser(req.user, req.body);
             return res.status(200).json(updatedUser);
