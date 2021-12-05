@@ -19,23 +19,28 @@ export class IncomeController implements IIncomeController {
     }
 
     async create(req: CustomRequest, res: Response) {
-        return this.service.create(req, res);
+        const newIncome = this.service.create(req.body, req.user);
+        return res.status(200).json({ income: newIncome});
     }
 
     async delete(req: CustomRequest, res: Response) {
-        return this.service.delete(req, res);
+        await this.service.delete(req, res);
+        return res.status(200).end();
     }
 
     async getList(req: CustomRequest, res: Response) {
-        return this.service.getList(req, res);
+        const incomes =  this.service.getList(req.user.id, +req.query.offset, +req.query.limit);
+        return res.status(200).json(incomes);
     }
 
     async read(req: CustomRequest, res: Response) {
-        return this.service.read(req, res);
+        const income =  this.service.read(+req.params.id, req.user.id);
+        return res.status(200).json({...income})
     }
 
     async update(req: CustomRequest, res: Response) {
-        return this.service.update(req, res);
+        const newIncome = this.service.update(+req.params.id, req.user, req.body);
+        return res.status(200).json({...newIncome});
     }
 }
 

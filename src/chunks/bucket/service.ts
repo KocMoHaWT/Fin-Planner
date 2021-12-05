@@ -1,23 +1,24 @@
 import { CustomRequest } from "../../interfaces/request";
-import { BucketRepository, IBucketRepository } from "./repository";
+import { IBucketRepository } from "./repository";
 import { Response, Request } from "express";
 import InjectableContainer from "../../application/InjectableContainer";
 import { Bucket, IBucket } from "./bucket";
 import { IBucketType } from "../../interfaces/bucketType";
-import { IActivityLogRepository } from "../activityLogs/repository";
 import { IActivityLogService } from "../activityLogs/service";
 import bucketFactory from "./bucketFactory";
 import { IIncomeService } from "../income/service";
+import { IActivityLog } from "../../interfaces/activityLog";
+import { IUser } from "../user/user";
 
 export interface IBucketService {
-    create: (req: CustomRequest, res: Response) => Promise<Response>;
-    update: (req: CustomRequest, res: Response) => Promise<Response>;
-    getList: (req: CustomRequest, res: Response) => Promise<Response>;
-    read: (req: CustomRequest, res: Response) => Promise<Response>;
-    delete: (req: CustomRequest, res: Response) => Promise<void>;
-    getBucketTypeList: (req: CustomRequest, res: Response) => Promise<Response<IBucketType[]>>;
-    getLogs: (req: CustomRequest, res: Response) => Promise<Response>;
-    moneyTransfer: (req: CustomRequest, res: Response) => Promise<Response>;
+    create: (bucketData: IBucket, user: IUser) => Promise<IBucket>;
+    update: (bucketId: number, userId: number, data: Partial<IBucket>) => Promise<IBucket>;
+    read: (bucketId: number, userId: number) => Promise<IBucket>;
+    delete: (bucketId: number, userId: number) => Promise<void>;
+    getList: (userId: number, offset: number, limit: number) => Promise<IBucket[]>;
+    getBucketTypeList: (offset: number, limit: number) => Promise<IBucketType[]>;
+    getLogs: (bucketId: number, userId: number) => Promise<IActivityLog[]>;
+    moneyTransfer: (userId: number, body: IActivityLog) => Promise<void>;
 }
 
 export class BucketService implements IBucketService {
@@ -31,63 +32,61 @@ export class BucketService implements IBucketService {
         this.incomeService = incomeService;
     }
 
-    async create(req: CustomRequest, res: Response): Promise<Response> {
-        const data = new Bucket(req.body, req.user?.defaultCurrency)
-        const newBucket = await this.repository.create(data.toJSON(), req.user.id);
+    async create(bucketData: IBucket, user: IUser): Promise<IBucket> {
+        const data = new Bucket(bucketData, user?.defaultCurrency)
+        const newBucket = await this.repository.create(data.toJSON(), user.id);
         const bucket = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: null })
-        return res.status(200).json({ bucket: bucket.toJSON() });
+        return bucket.toJSON()
     }
 
-    async update(req: CustomRequest, res: Response): Promise<Response> {
-        const oldBucket = await this.repository.read(+req.params.id, req.user.id);
+    async update(bucketId: number, userId: number, data: Partial<IBucket>): Promise<IBucket> {
+        const oldBucket = await this.repository.read(bucketId, userId);
         const bucket = bucketFactory.createFromDb({ dbBucketData: oldBucket, bucketType: {} as any });
-        bucket.set(req.body);
+        bucket.set(data);
         const newResult = await this.repository.update(bucket);
-        const logs = await this.activityLogService.getLogsByBucketId(+req.params.id, req.user.id);
-        const bucketType = await this.repository.getBucketTypeById(+req.params.id);
+        const logs = await this.activityLogService.getLogsByBucketId(bucketId, userId);
+        const bucketType = await this.repository.getBucketTypeById(bucketId);
         const newBucket = bucketFactory.createFromDb({ dbBucketData: newResult, bucketType, logs });
-        return res.status(200).json({ ...newBucket });
+        return newBucket.toJSON();
     }
 
-    async delete(req: CustomRequest, res: Response): Promise<void> {
-        await this.repository.delete(+req.params.id, req.user.id);
-        return res.status(200).end();
+    async delete(bucketId: number, userId: number): Promise<void> {
+        await this.repository.delete(bucketId, userId);
     }
 
-    async read(req: CustomRequest, res: Response): Promise<Response> {
-        const bucket = await this.repository.read(+req.params.id, req.user.id);
-        const bucketType = await this.repository.getBucketTypeById(+req.params.id);
-        const logs = await this.activityLogService.getLogsByBucketId(+req.params.id, req.user.id);
+    async read(bucketId: number, userId: number): Promise<IBucket> {
+        const bucket = await this.repository.read(bucketId, userId);
+        const bucketType = await this.repository.getBucketTypeById(bucketId);
+        const logs = await this.activityLogService.getLogsByBucketId(bucketId, userId);
         const fullBucket = bucketFactory.createFromDb({ dbBucketData: bucket, bucketType, logs });
-        return res.status(200).json({ ...fullBucket });
+        return fullBucket.toJSON();
     }
 
-    async getBucket(id: number, userId: number): Promise<IBucket> {
-        const bucket = await this.repository.read(id, userId);
+    async getBucket(bucketId: number, userId: number): Promise<IBucket> {
+        const bucket = await this.repository.read(bucketId, userId);
         const fullBucket = bucketFactory.createFromDb({ dbBucketData: bucket, bucketType: null, logs: null });
-        return fullBucket;
+        return fullBucket.toJSON();
+    }
+    async getList(userId: number, offset: number = 0,limit: number = 10): Promise<IBucket[]> {
+        offset = Number.isInteger(offset) ? offset : 0;
+        limit = Number.isInteger(limit) ? limit : 10;
+        const buckets = await this.repository.getList(userId, offset, limit);
+       return buckets;
     }
 
-    async getList(req: CustomRequest, res: Response): Promise<Response> {
-        const buckets = await this.repository.getList(+req.params.offset, +req.params.limit);
-        return res.status(200).json(buckets);
+    async getBucketTypeList(offset: number, limit: number): Promise<IBucketType[]> {
+        const bucketTypes = await this.repository.getBucketTypeList(offset || 0, limit || 50);
+        return bucketTypes;
     }
 
-    async getBucketTypeList(req: CustomRequest, res: Response): Promise<Response<IBucketType[]>> {
-        const buckets = await this.repository.getBucketTypeList(+req.params.offset || 0, +req.params.limit || 50);
-        return res.status(200).json(buckets);
+    async getLogs(bucketId: number, userId: number): Promise<IActivityLog[]> {
+        return this.activityLogService.getLogsByBucketId(bucketId, userId);
     }
 
-    async getLogs(req: CustomRequest, res: Response): Promise<Response> {
-        const logs = await this.activityLogService.getLogsByBucketId(+req.params.id, req.user.id);
-        return res.status(200).json(logs);
-    }
-
-    async moneyTransfer(req: CustomRequest, res: Response): Promise<Response> {
-        const bucket = await this.getBucket(req.body.bucketId, req.user.id);
-        const income = await this.incomeService.getIncome(req.body.incomeId, req.user.id);
-        await this.activityLogService.createMoneyTransfer(req.body, bucket.currency, income.currency);
-        return res.status(200).json();
+    async moneyTransfer(userId: number, body: IActivityLog): Promise<void> {
+        const bucket = await this.getBucket(body.bucketId, userId);
+        const income = await this.incomeService.read(body.incomeId, userId);
+        await this.activityLogService.createMoneyTransfer(body, bucket.currency, income.currency);
     }
 }
 

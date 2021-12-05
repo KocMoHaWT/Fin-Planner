@@ -4,9 +4,9 @@ import { Income, IIncome } from "./income";
 
 export interface IIncomeRepository {
     create: (body: IIncome, userId: number) => Promise<Income>;
-    update: (income: IIncome) => Promise<Response>;
+    update: (income: IIncome) => Promise<Income>;
     read: (id: number, userId: number) => Promise<Income>;
-    getList: (skip: number, limit: number, id: number) => Promise<IIncome[]>
+    getList: (id: number, skip: number, limit: number, ) => Promise<IIncome[]>
     delete: (id: number, userId: number) => Promise<void>;
     getLogsByIncometId: (incomeId: number, userId: number) => Promise<any []>;
 }
@@ -53,8 +53,7 @@ export class IncomeRepository {
         return null;
     }
 
-    ///  change to better 
-    async getList(skip: number = 0, limit: number = 50, id: number): Promise<IIncome[]> {
+    async getList(id: number, skip: number = 0, limit: number = 50, ): Promise<IIncome[]> {
         return await this.manager().query(
             `
         SELECT * 
@@ -79,8 +78,7 @@ export class IncomeRepository {
          // res after db res [ [{}], 1 ] this question needs to be investigated
          const newIncome = res[0].pop();
          if (newIncome) {
-             const test = new Income(newIncome);
-             return test;
+             return new Income(newIncome)
          }
          return null;
     }

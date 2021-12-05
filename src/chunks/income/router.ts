@@ -23,11 +23,11 @@ export class IncomeRouter extends CommonRoutesConfig {
 
     configureRoutes() {
         this.router.use(this.authService.middleware.bind(this.authService));
-        this.router.get('/:id', [this.incomeController.read.bind(this.incomeController)]);
         this.router.post('/', [this.incomeController.create.bind(this.incomeController)]);
         this.router.post('/update/:id', [this.incomeController.update.bind(this.incomeController)]);
         this.router.delete('/:id', [this.incomeController.delete.bind(this.incomeController)]);
-        this.router.get('/:offset/:limit', [this.incomeController.read.bind(this.incomeController)]);
+        this.router.get('list', [this.incomeController.getList.bind(this.incomeController)]);
+        this.router.get('/:id', [this.incomeController.read.bind(this.incomeController)]);
         return this.router;
     }
 }

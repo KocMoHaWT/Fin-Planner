@@ -22,38 +22,45 @@ export class BucketController implements IBucketController {
     }
 
     async create(req: CustomRequest, res: Response) {
-        return this.service.create(req, res);
+        const bucket = await this.service.create(req.body, req.user.toJSON());
+        return res.status(200).json({ bucket });
     }
 
     async delete(req: CustomRequest, res: Response) {
-        return this.service.delete(req, res);
+        await this.service.delete(+req.params.id, req.user.id);
+        return res.status(200).end();
     }
 
     async getList(req: CustomRequest, res: Response) {
-        return this.service.getList(req, res);
+        const buckets = await this.service.getList(req.user.id, +req.query.offset, +req.query.limit);
+        return res.status(200).json(buckets);
     }
 
     async read(req: CustomRequest, res: Response) {
-        return this.service.read(req, res);
+        const bucket = await this.service.read(+req.params.id, +req.user.id);
+        return res.status(200).json({ ...bucket });
     }
 
     async update(req: CustomRequest, res: Response) {
-        return this.service.update(req, res);
+        const bucket = await this.service.update(+req.params.id, req.user.id, req.body);
+        return res.status(200).json({ ...bucket });
     }
 
     async getBucketTypeList(req: CustomRequest, res: Response) {
-        return this.service.getBucketTypeList(req, res);
+        const buckets = await this.service.getBucketTypeList(+req.body.offset, +req.body.limit);
+        return res.status(200).json(buckets);
     }
 
     async getLogs(req: CustomRequest, res: Response):Promise<any> {
-        return this.service.getLogs(req, res);
+        const logs = await this.service.getLogs(+req.params.id, req.user.id);
+        return res.status(200).json(logs);
     }
 
     async moneyTransfer(req: CustomRequest, res: Response):Promise<any> {
-        return this.service.moneyTransfer(req, res);
+        await this.service.moneyTransfer(req.user.id, req.body);
+        return res.status(200).json();
     }
 }
-
 
 const init = new Promise(() => {
     InjectableContainer.setDependency(BucketController, 'bucketController', ['bucketService']);

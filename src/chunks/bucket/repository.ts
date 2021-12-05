@@ -9,7 +9,7 @@ export interface IBucketRepository {
     create: (body: IBucket, userId: number) => Promise<BucketData>;
     update: (bucket: IBucket) => Promise<BucketData>;
     read: (id: number, userId: number) => Promise<BucketData>;
-    getList: (skip: number, limit: number) => Promise<IBucket[]>;
+    getList: (userId: number, offset: number, limit: number) => Promise<IBucket[]>;
     delete: (id: number, userId: number) => Promise<void>;
     getBucketTypeList: (skip: number, limit: number) => Promise<IBucketType[]>;
     createActivityLog: (bucketId: number, incomeId: number, ammount: number, direction: MovementDirection) => Promise<void>
@@ -70,14 +70,16 @@ export class BucketRepository {
     }
 
     ///  change to better 
-    async getList(skip: number = 0, limit: number = 50): Promise<IBucket[]> {
+    async getList(userId: number, skip: number, limit: number): Promise<IBucket[]> {
         return await this.manager().query(
             `
         SELECT * 
         FROM buckets
-        LIMIT $1 OFFSET $2
+        WHERE user_id = $3
+        LIMIT $1 OFFSET $2;
+        
     `,
-            [limit, skip]
+            [limit, skip, userId]
         )
     }
 

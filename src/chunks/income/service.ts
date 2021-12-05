@@ -1,16 +1,16 @@
 import { CustomRequest } from "../../interfaces/request";
-import { IncomeRepository, IIncomeRepository } from "./repository";
-import { Response, Request } from "express";
+import { IIncomeRepository } from "./repository";
+import { Response } from "express";
 import InjectableContainer from "../../application/InjectableContainer";
-import { Income } from "./income";
+import { IIncome, Income } from "./income";
+import User from "../user/user";
 
 export interface IIncomeService {
-    create: (req: CustomRequest, res: Response) => Promise<Response>;
-    update: (req: CustomRequest, res: Response) => Promise<Response>;
-    getList: (req: CustomRequest, res: Response) => Promise<Response>;
-    read: (req: CustomRequest, res: Response) => Promise<Response>;
+    create: (body: IIncome, user: User) => Promise<Income>;
+    update: (incomeId: number, user: User, body: IIncome) => Promise<Income>;
+    getList: (userId: number, offset?: number, limit?: number) => Promise<IIncome[]>;
+    read: (id: number, userId: number) => Promise<Income>;
     delete: (req: CustomRequest, res: Response) => Promise<void>;
-    getIncome: (id: number, userId: number) => Promise<Income>;
 }
 
 export class IncomeService implements IIncomeService {
@@ -20,36 +20,29 @@ export class IncomeService implements IIncomeService {
         this.repository = incomeRepository;
     }
 
-    async create(req: CustomRequest, res: Response): Promise<Response> {
-        const data = new Income(req.body, req.user.defaultCurrency);
-        const newIncome =  await this.repository.create(data.toJSON(), req.user.id);
-        return res.status(200).json({ income: newIncome});
+    async create(body: IIncome, user: User): Promise<Income> {
+        const data = new Income(body, user.defaultCurrency);
+        const newIncome =  await this.repository.create(data.toJSON(), user.id);
+       return newIncome;
     }
 
-    async update(req: CustomRequest, res: Response): Promise<Response> {
-        const oldIncome = await this.repository.read(+req.params.id, req.user.id);
-        oldIncome.set(req.body);
-        const newBucket = await this.repository.update(oldIncome);
-        return res.status(200).json({...newBucket});
+    async update(incomeId: number, user: User, body: IIncome): Promise<Income> {
+        const oldIncome = await this.repository.read(incomeId, user.id);
+        oldIncome.set(body);
+        return this.repository.update(oldIncome);   
     }
 
     async delete(req: CustomRequest, res: Response): Promise<void> {
         await this.repository.delete(+req.params.id, req.user.id);
-        return res.status(200).end();
     }
 
-    async read(req: CustomRequest, res: Response): Promise<Response>  {
-        const income = await this.repository.read(+req.params.id, req.user.id);
-        return res.status(200).json({...income});
-    }
-
-    async getIncome(id: number, userId: number): Promise<Income>  {
+    async read(id: number, userId: number): Promise<Income>  {
         return this.repository.read(id, userId);
     }
 
-    async getList(req: CustomRequest, res: Response): Promise<Response>  {
-        const incomes = await this.repository.getList(+req.params.offset, +req.params.limit, req.user.id);
-        return res.status(200).json(incomes);
+    async getList(userId: number, offset: number = 0,limit: number = 10): Promise<IIncome []>  {
+        const incomes = await this.repository.getList(userId, offset, limit);
+        return incomes;
     }
 }
 

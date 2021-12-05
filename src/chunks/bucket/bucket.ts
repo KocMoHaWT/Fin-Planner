@@ -55,8 +55,6 @@ export class Bucket implements IBucket{
         this.logs = logs;
     }
 
-
-
     toJSON(): IBucket {
         return {
             id: this.id,
