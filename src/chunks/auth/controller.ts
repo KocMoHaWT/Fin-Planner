@@ -23,7 +23,7 @@ export class AuthController implements IAuthController {
             return res.status(401).end();
         }
         try {
-            const tokens = this.service.refreshToken(token);
+            const tokens = await this.service.refreshToken(token);
             return res.status(200).json(tokens);
         } catch (error) {
             return res.status(400).json({ error });

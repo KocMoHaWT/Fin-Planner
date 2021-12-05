@@ -39,11 +39,13 @@ export class AuthService implements IAuthService {
     }
 
     async refreshToken(token: string): Promise<JWTTokens> {
-        const userId = await this.repository.getUserAuthByRefreshToken(token);
+        const { userId } = await this.repository.getUserAuthByRefreshToken(token);
         if (!userId) {
             throw new Error('error no userId');
         }
-        return await jwtFactory.createTokenPair(+userId);
+        const tokens = await jwtFactory.createTokenPair(+userId);
+        await this.repository.saveRefreshToken(tokens.refreshToken, +userId);
+        return tokens;
     }
 
     async loginUser(email: string, password: string): Promise<JWTTokens> {

@@ -9,7 +9,7 @@ export interface IAuthRepository {
     addIdentity: (id: number, identity: string, type: Identity) => Promise<void>;
     getUserByIdentity: (identity: string, type: Identity) => Promise<User | null>;
     create: (userId: number, google: string) => Promise<void>;
-    getUserAuthByRefreshToken: (refreshToken: string) => Promise<string>
+    getUserAuthByRefreshToken: (refreshToken: string) => Promise<{userId: string}>
 }
 
 const TokenByType = {
@@ -76,9 +76,9 @@ export class AuthRepository implements IAuthRepository {
         return null;
     }
 
-    async getUserAuthByRefreshToken(refreshToken: string): Promise<string> {
+    async getUserAuthByRefreshToken(refreshToken: string): Promise<{userId: string}> {
         const res = await this.manager().query(`
-            SELECT user_id as userId 
+            SELECT user_id AS "userId" 
             FROM usersauth
             WHERE refresh_token = $1;
         `, [refreshToken]);

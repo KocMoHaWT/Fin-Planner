@@ -8,7 +8,7 @@ import AuthData from "../auth/valueObjects/authenticationData";
 
 export interface IUserService {
     create: (body: AuthData) => Promise<User>;
-    updateUser: (currentUser: User, updatedUser: Partial<User>) => Promise<User>;
+    updateUser: (currentUser: User, updatedUser: Partial<User>) => Promise<IUser>;
     getUser: (id: number) => Promise<User>;
     sendUserToFront: (user: User) => IUser;
     verifyUser: (email: string, password: string) => Promise<User>;
@@ -27,10 +27,10 @@ export class UserService {
         return user;
     }
 
-    async updateUser(currentUser: User, updatedUser: Partial<User>): Promise<User> {
+    async updateUser(currentUser: User, updatedUser: Partial<User>): Promise<IUser> {
         currentUser.set(updatedUser);
-        const result = await this.repository.update(currentUser);
-        return result;
+        const user = await this.repository.update(currentUser);
+        return user.toJSON();
     }
 
     async getUser(id: number) {

@@ -68,14 +68,15 @@ export class UserRepository implements IUserRepository {
         const res = await this.manager().query(
             `
         UPDATE users
-        SET name=$1, default_currency=$2
+        SET name=$2, default_currency=$3
         WHERE id=$1
-        RETURNING *;
+        RETURNING id, name, email, created_at AS createdAt, default_currency AS defaultCurrency;
     `,
-            [simpleUser.name, simpleUser.defaultCurrency]
+            [user.id, simpleUser.name, simpleUser.defaultCurrency]
         )
         if (res.length) {
-            return new User(res[0]);
+            const user = res[0].pop();
+            return new User(user);
         }
         return null;
     };

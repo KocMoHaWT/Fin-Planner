@@ -15,7 +15,7 @@ interface IUserRouter {
 export class UserRouter extends CommonRoutesConfig {
     private userController: IUserController;
     private authService: IAuthService;
-    constructor({ userController, commonPath = '/users', router = express.Router(), authService} : IUserRouter) {
+    constructor({ userController, commonPath = '/user', router = express.Router(), authService} : IUserRouter) {
         super(router, 'Authrouter', commonPath);
         this.userController = userController
         this.authService = authService;
@@ -23,6 +23,7 @@ export class UserRouter extends CommonRoutesConfig {
 
     configureRoutes() {
         this.router.get('/', [this.authService.middleware.bind(this.authService), this.userController.read.bind(this.userController)]);
+        this.router.post('/update', [this.authService.middleware.bind(this.authService), this.userController.update.bind(this.userController)]);
         return this.router;
     }
 }
