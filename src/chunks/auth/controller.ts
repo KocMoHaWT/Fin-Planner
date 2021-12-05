@@ -3,7 +3,7 @@ import { Response, Request } from "express";
 import InjectableContainer from "../../application/InjectableContainer";
 
 export interface IAuthController {
-    refreshToken: (req: Request, res: Response ) => Promise<any>;
+    refreshToken: (req: Request, res: Response) => Promise<any>;
     googleCallback: (req: Request, res: Response) => Promise<void | Response>;
     register: (req: Request, res: Response) => Promise<any>;
     login: (req: Request, res: Response) => Promise<any>;
@@ -18,19 +18,44 @@ export class AuthController implements IAuthController {
     }
 
     async refreshToken(req: Request, res: Response) {
-        return this.service.refreshToken(req, res);
+        const token = req.body.token;
+        if (!token) {
+            return res.status(401).end();
+        }
+        try {
+            const tokens = this.service.refreshToken(token);
+            return res.status(200).json(tokens);
+        } catch (error) {
+            return res.status(400).json({ error });
+        }
     }
 
+    // to implement full google auth
     async googleCallback(req: Request, res: Response) {
         this.service.googleCallBack(req, res);
     }
 
     async register(req: Request, res: Response) {
-        return this.service.registerUser(req, res);
+        try {
+            const tokens = await this.service.registerUser(req.body);
+            return res.status(200).json({ ...tokens });
+        } catch (error) {
+            return res.status(409).end();
+        }
     }
 
     async login(req: Request, res: Response) {
-        return this.service.loginUser(req, res);
+        if (!req.body.email || !req.body.password) {
+            return res.status(400);
+        }
+        try {
+            const tokens = this.service.loginUser(req.body.email, req.body.password);
+            return res.status(201).json({
+                ...tokens
+            });
+        } catch (error) {
+            return res.status(400).json({ error });
+        }
     }
 
     async logout(req: Request, res: Response) {

@@ -1,6 +1,6 @@
 import { emailRegExp, passwordRegExp } from "../../../utils/regexp";
 
-interface IAuthData {
+export interface IAuthData {
     email?: string;
     password?: string;
     name?: string;

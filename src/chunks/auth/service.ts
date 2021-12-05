@@ -13,18 +13,19 @@ import AuthStrategy from "./strategies/authStrategy";
 import { IRedisRepository } from "./datasource/redis";
 import jwtFactory from "./factories/jwtFactory";
 import { IAuthRepository } from "./repository";
-import AuthenticationData from "./valueObjects/authenticationData";
+import AuthenticationData, { IAuthData } from "./valueObjects/authenticationData";
 import { CustomRequest } from "../../interfaces/request";
+import { JWTTokens } from "../../interfaces/jwtTokens";
 
 export interface IAuthService {
     middleware: (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
     googleCallBack: (req: Request, res: Response) => Promise<void | Response>;
-    registerUser: (req: Request, res: Response) => Promise<void | Response>;
-    loginUser: (req: Request, res: Response) => Promise<void | Response>;
+    registerUser: (authData: AuthenticationData) => Promise<JWTTokens>
+    loginUser: (email: string, password: string) => Promise<JWTTokens>;
     logout: (req: Request, res: Response) => Promise<void | Response>;
     getUserByGoogleId: (token: string) => Promise<User>;
     create: (userId: number, googleToken: string) => Promise<void>
-    refreshToken: (req: Request, res: Response) => Promise<void | Response>;
+    refreshToken: (token: string) => Promise<JWTTokens>;
 }
 
 export class AuthService implements IAuthService {
@@ -37,37 +38,22 @@ export class AuthService implements IAuthService {
         this.repository = authRepository;
     }
 
-    async refreshToken(req: Request, res: Response): Promise<void | Response> {
-        const token = req.body?.token;
-
-        if (!token) {
-            return res.status(401).end();
+    async refreshToken(token: string): Promise<JWTTokens> {
+        const userId = await this.repository.getUserAuthByRefreshToken(token);
+        if (!userId) {
+            throw new Error('error no userId');
         }
-
-        try {
-            const userId = await this.repository.getUserAuthByRefreshToken(token);
-            if (!userId) return res.status(401).end('error no userId');
-            const tokens = await jwtFactory.createTokenPair(+userId);
-            return res.status(200).json(tokens);
-        } catch (error) {
-            return res.status(400).json({ error });
-        }
+        return await jwtFactory.createTokenPair(+userId);
     }
 
-    async loginUser(req: Request, res: Response): Promise<void | Response> {
-        try {
-            const user = await this.userService.verifyUser(req.body.email, req.body.password);
-            if (!user) {
-                res.status(400).end();
-            }
-            const tokens = await jwtFactory.createTokenPair(user.id);
-            await this.repository.saveRefreshToken(tokens.refreshToken, user.id);
-            return res.status(201).json({
-                ...tokens
-            });
-        } catch (error) {
-            return res.status(400).json({ error });
+    async loginUser(email: string, password: string): Promise<JWTTokens> {
+        const user = await this.userService.verifyUser(email, password);
+        if (!user) {
+            throw new Error('no user');
         }
+        const tokens = await jwtFactory.createTokenPair(user.id);
+        await this.repository.saveRefreshToken(tokens.refreshToken, user.id);
+        return tokens;
     }
 
     async middleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
@@ -79,8 +65,8 @@ export class AuthService implements IAuthService {
         if (authHeader && tokenInHeader) {
             token = tokenInHeader;
             type = TokenType.jwt
-        } 
-        if (!authHeader && (req.cookies.googleToken || req.cookies.appleToken)){
+        }
+        if (!authHeader && (req.cookies.googleToken || req.cookies.appleToken)) {
             token = req.cookies.googleToken ? req.cookies.googleToken : req.cookies.appleToken;
             type = req.cookies.googleToken ? TokenType.google : TokenType.apple
         }
@@ -100,7 +86,6 @@ export class AuthService implements IAuthService {
                     break;
             }
             const user = await authContext.verify(token);
-            console.log('user', user);
 
             if (!user) return res.status(409).end();
             //@ts-ignore
@@ -133,22 +118,21 @@ export class AuthService implements IAuthService {
         return id;
     }
 
-    async registerUser(req: Request, res: Response): Promise<void | Response> {
-        try {
-            const isExists = await this.userService.isUserExists(req.body.email);
-            const authUser = new AuthenticationData({ email: req.body.email, name: req.body.name, password: req.body.password })
-            if (isExists) return res.status(409).end();
-            const user = await this.userService.create(authUser);
-            await this.create(user.id, null);
-            if (!user) {
-                throw new Error('error in save');
-            }
-            const tokens = await jwtFactory.createTokenPair(user.id);
-            this.repository.saveRefreshToken(tokens.refreshToken, user.id);
-            return res.status(200).json({ ...tokens });
-        } catch (error) {
-            return res.status(409).end();
+    async registerUser(data: IAuthData): Promise<JWTTokens> {
+        const authData = new AuthenticationData(data)
+        const isExists = await this.userService.isUserExists(authData.email);
+        const authUser = new AuthenticationData({ email: authData.email, name: authData.name, password: authData.password })
+        if (isExists) {
+            throw new Error('does not exist');
+        };
+        const user = await this.userService.create(authUser);
+        await this.create(user.id, null);
+        if (!user) {
+            throw new Error('error in save');
         }
+        const tokens = await jwtFactory.createTokenPair(user.id);
+        this.repository.saveRefreshToken(tokens.refreshToken, user.id);
+        return tokens;
     }
 
     async googleCallBack(data: any) {
@@ -156,7 +140,6 @@ export class AuthService implements IAuthService {
     }
 
     async logout(req: CustomRequest, res: Response) {
-        if (!req.user) return res.status(400).end();
         const authHeader = req.headers["authorization"];
         if (authHeader) {
             return this.repository.saveRefreshToken(null, req.user.id);
