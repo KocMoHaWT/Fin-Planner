@@ -15,7 +15,7 @@ export interface BucketData {
     status: Status;
     period: PeriodType;
     linked_income_id?: number;
-    tags: string;
+    tags: string[];
 }
 
 class BucketFactory {

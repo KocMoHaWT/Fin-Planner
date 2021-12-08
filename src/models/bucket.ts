@@ -37,9 +37,6 @@ export class Bucket {
   @Column({ type: "numeric", nullable: false })
   ammount: number;
 
-  @Column({ type: "varchar", nullable: true })
-  tags: string;
-
   @Column({ type: 'enum', nullable: false, enum: Status, default: Status.empty })
   status: Status;
 

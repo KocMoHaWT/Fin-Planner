@@ -36,6 +36,11 @@ export class BucketService implements IBucketService {
         const data = new Bucket(bucketData, user?.defaultCurrency)
         const newBucket = await this.repository.create(data.toJSON(), user.id);
         const bucket = bucketFactory.createFromDb({ dbBucketData: newBucket, bucketType: null })
+        if (bucketData.tags) {
+            const buckeTags = await this.repository.setNewBucketTags(bucket.id, bucketData.tags);
+            // @ts-ignore
+            bucket.tags = buckeTags;
+        }
         return bucket.toJSON()
     }
 

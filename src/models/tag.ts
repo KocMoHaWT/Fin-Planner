@@ -12,6 +12,7 @@ import {
     OneToMany,
     ManyToMany,
     JoinTable,
+    PrimaryColumn,
   } from "typeorm";
 import { Bucket } from "./bucket";
   
@@ -20,15 +21,21 @@ import { Bucket } from "./bucket";
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: "varchar", length: 200, nullable: false })
+    @Column({ type: "varchar", length: 200, nullable: false, unique: true })
     value: string;
 
-    @OneToOne(() => Tag)
-    @JoinColumn()
-    tag: Tag;
-
     @ManyToMany(() => Bucket)
-    @JoinTable()
+    @JoinTable({
+      name: "bucket_tags",
+      joinColumn: {
+          name: "tag",
+          referencedColumnName: "id"
+      },
+      inverseJoinColumn: {
+          name: "bucket_id",
+          referencedColumnName: "id"
+      }
+  })
     categories: Bucket[];
   }
   

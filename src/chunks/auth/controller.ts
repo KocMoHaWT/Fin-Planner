@@ -49,7 +49,7 @@ export class AuthController implements IAuthController {
             return res.status(400);
         }
         try {
-            const tokens = this.service.loginUser(req.body.email, req.body.password);
+            const tokens = await this.service.loginUser(req.body.email, req.body.password);
             return res.status(201).json({
                 ...tokens
             });
