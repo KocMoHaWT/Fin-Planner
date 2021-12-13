@@ -16,6 +16,7 @@ const routers = ['authRouter', 'userRouter', 'bucketRouter', 'incomeRouter'];
 const app = express();
 const server = new Server(app, connection, 3001);
 
+
 const globalMiddleware: Array<RequestHandler> = [
     express.urlencoded({ extended: false }),
     // cors({ credentials: true, origin: true }),
@@ -27,7 +28,7 @@ const globalMiddleware: Array<RequestHandler> = [
 Promise.resolve()
     .then(() => server.initDatabase())
     .then(() => {
-       Promise.all([ ...userInit, ...autInit, ...bucketInit, ...incomeInit, ...activityLogInit, ...currencyInit])
+        Promise.all([...userInit, ...autInit, ...bucketInit, ...incomeInit, ...activityLogInit, ...currencyInit])
     })
     .then(() => {
         server.loadGlobalMiddleware(globalMiddleware);

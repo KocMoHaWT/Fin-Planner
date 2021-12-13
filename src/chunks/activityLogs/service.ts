@@ -32,7 +32,6 @@ export class ActivityLogService implements IActivityLogService {
     }
 
     async getIncomeLogs(id: number, userId: number): Promise<IActivityLog[]> {
-        console.log('qeqwqweqweqewqweewq', id, userId, this.repository);
         return this.repository.getLogsByIncomeId(id, userId);
     }
 }

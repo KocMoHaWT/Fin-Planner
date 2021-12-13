@@ -2,6 +2,9 @@ import { Application, RequestHandler } from 'express';
 import * as http from 'http';
 import InjectableContainer from './application/InjectableContainer';
 
+import * as swaggerUi from 'swagger-ui-express';
+import { options } from './swagger';
+
 export default class Server {
     private app: Application;
     private readonly port: number;
@@ -20,6 +23,7 @@ export default class Server {
     };
 
     public loadGlobalMiddleware(middleware: Array<RequestHandler>): void {
+        this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(options))
         // global stuff like cors, body-parser, etc
         middleware.forEach(mw => {
             this.app.use(mw);

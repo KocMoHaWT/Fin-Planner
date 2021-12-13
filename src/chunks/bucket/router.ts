@@ -31,7 +31,6 @@ export class BucketRouter extends CommonRoutesConfig {
         this.router.get('/list/', [this.authService.middleware.bind(this.authService), this.bucketController.getList.bind(this.bucketController)]);
         this.router.get('/:id', [this.authService.middleware.bind(this.authService), this.bucketController.read.bind(this.bucketController)]);
         this.router.get('/:id/logs', [this.authService.middleware.bind(this.authService), this.bucketController.getLogs.bind(this.bucketController)]);
-        this.router.post('/update/:id', [this.authService.middleware.bind(this.authService), this.bucketController.update.bind(this.bucketController)]);
         return this.router;
     }
 }
